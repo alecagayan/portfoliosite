@@ -39,7 +39,8 @@
     "icon": "📁",
     "tags": ["Python", "Keras", "NumPy", "Pandas"],
     "links": [
-      { "label": "GitHub", "url": "https://github.com/alecagayan/skin-cancer", "ariaLabel": "View source code on GitHub" }
+      { "label": "GitHub", "url": "https://github.com/alecagayan/skin-cancer", "ariaLabel": "View source code on GitHub" },
+      { "label": "Live Demo", "url": "#playground", "ariaLabel": "Try the live demo in the Playground section" }
     ]
   }
 ]

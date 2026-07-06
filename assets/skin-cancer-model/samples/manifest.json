@@ -1,0 +1,128 @@
+[
+  {
+    "file": "lesion-01.jpg",
+    "isic_id": "ISIC_0000000",
+    "diagnosis": "Nevus",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-02.jpg",
+    "isic_id": "ISIC_0000001",
+    "diagnosis": "Nevus",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-03.jpg",
+    "isic_id": "ISIC_0000003",
+    "diagnosis": "Nevus",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-04.jpg",
+    "isic_id": "ISIC_0000002",
+    "diagnosis": "Melanoma, NOS",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-05.jpg",
+    "isic_id": "ISIC_0000004",
+    "diagnosis": "Melanoma, NOS",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-06.jpg",
+    "isic_id": "ISIC_0000013",
+    "diagnosis": "Melanoma Invasive",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-07.jpg",
+    "isic_id": "ISIC_0000026",
+    "diagnosis": "Melanoma Invasive",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-08.jpg",
+    "isic_id": "ISIC_0000022",
+    "diagnosis": "Melanoma in situ",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-09.jpg",
+    "isic_id": "ISIC_0009876",
+    "diagnosis": "Solar lentigo",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-10.jpg",
+    "isic_id": "ISIC_0009926",
+    "diagnosis": "Solar lentigo",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-11.jpg",
+    "isic_id": "ISIC_0009900",
+    "diagnosis": "Lentigo NOS",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-12.jpg",
+    "isic_id": "ISIC_0001104",
+    "diagnosis": "Seborrheic keratosis",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-13.jpg",
+    "isic_id": "ISIC_0001113",
+    "diagnosis": "Seborrheic keratosis",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-14.jpg",
+    "isic_id": "ISIC_0001120",
+    "diagnosis": "Basal cell carcinoma",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-15.jpg",
+    "isic_id": "ISIC_0001149",
+    "diagnosis": "Basal cell carcinoma",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-16.jpg",
+    "isic_id": "ISIC_0001114",
+    "diagnosis": "Dermatofibroma",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-17.jpg",
+    "isic_id": "ISIC_0001130",
+    "diagnosis": "Dermatofibroma",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  },
+  {
+    "file": "lesion-18.jpg",
+    "isic_id": "ISIC_0001115",
+    "diagnosis": "Hemangioma",
+    "license": "CC-0",
+    "attribution": "Anonymous"
+  }
+]

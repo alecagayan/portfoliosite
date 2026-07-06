@@ -32,6 +32,7 @@
           <li><a href="#skills">Skills</a></li>
           <li><a href="#projects">Projects</a></li>
           <li><a href="#certifications">Certifications</a></li>
+          <li><a href="#playground">Playground</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
@@ -147,9 +148,99 @@
       </div>
     </section>
 
+    <section id="playground" class="section">
+      <div class="container">
+        <h2 class="section-title"><span>06.</span> Playground</h2>
+        <p class="playground-intro">
+          A small demo built from scratch: the skin lesion classifier from my
+          <a href="#projects">Skin Cancer Detection project</a>, running entirely in your browser.
+        </p>
+
+        <div id="panelSkin">
+          <p class="playground-desc">
+            A convolutional neural network trained on the <strong>HAM10000</strong> dermatoscopic
+            image dataset (7 lesion classes), running as a TensorFlow.js model directly in your
+            browser - the same model from my Skin Cancer Detection project. Upload a photo of a
+            skin lesion, or try a random sample image (blurred by default, since real lesion
+            photos aren't for everyone - click to reveal).
+          </p>
+          <div class="skin-demo">
+            <div class="skin-upload-wrap">
+              <div class="skin-dropzone" id="skinDropzone" role="button" tabindex="0" aria-label="Upload an image">
+                <img id="skinPreview" alt="" hidden />
+                <div class="skin-blur-overlay" id="skinBlurOverlay" hidden>
+                  <button type="button" class="skin-reveal-btn" id="skinRevealBtn" aria-label="Reveal image">
+                    <svg class="eye-slash-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+                      <circle cx="12" cy="12" r="3" />
+                      <line x1="2" y1="2" x2="22" y2="22" />
+                    </svg>
+                    <span>Click to reveal</span>
+                  </button>
+                </div>
+                <span class="skin-dropzone-label" id="skinDropzoneLabel">Click to upload, or drag an image here</span>
+              </div>
+              <input type="file" id="skinFileInput" accept="image/*" hidden />
+              <div class="skin-actions">
+                <button type="button" id="skinSample" class="btn btn-secondary btn-small">Try Sample Image</button>
+                <button type="button" id="skinClear" class="btn btn-secondary btn-small">Clear</button>
+              </div>
+            </div>
+            <div class="skin-results" id="skinResults">
+              <p class="pg-placeholder" id="skinStatus">Upload a dermatoscopic image to classify it.</p>
+              <div class="pg-result-body" id="skinResultBody" hidden>
+                <div class="pg-prediction">
+                  <span class="pg-predicted" id="skinPredicted"></span>
+                  <span class="pg-confidence" id="skinConfidence"></span>
+                </div>
+                <div class="pg-bars" id="skinBars">
+                  <div class="pg-bar-row" data-code="akiec">
+                    <span>akiec</span>
+                    <div class="pg-bar"><div></div></div>
+                    <span class="pg-bar-pct">0%</span>
+                  </div>
+                  <div class="pg-bar-row" data-code="bcc">
+                    <span>bcc</span>
+                    <div class="pg-bar"><div></div></div>
+                    <span class="pg-bar-pct">0%</span>
+                  </div>
+                  <div class="pg-bar-row" data-code="bkl">
+                    <span>bkl</span>
+                    <div class="pg-bar"><div></div></div>
+                    <span class="pg-bar-pct">0%</span>
+                  </div>
+                  <div class="pg-bar-row" data-code="df">
+                    <span>df</span>
+                    <div class="pg-bar"><div></div></div>
+                    <span class="pg-bar-pct">0%</span>
+                  </div>
+                  <div class="pg-bar-row" data-code="mel">
+                    <span>mel</span>
+                    <div class="pg-bar"><div></div></div>
+                    <span class="pg-bar-pct">0%</span>
+                  </div>
+                  <div class="pg-bar-row" data-code="nv">
+                    <span>nv</span>
+                    <div class="pg-bar"><div></div></div>
+                    <span class="pg-bar-pct">0%</span>
+                  </div>
+                  <div class="pg-bar-row" data-code="vasc">
+                    <span>vasc</span>
+                    <div class="pg-bar"><div></div></div>
+                    <span class="pg-bar-pct">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="skin-disclaimer">For demonstration only - not a medical device, and not a substitute for a dermatologist.</p>
+        </div>
+      </div>
+    </section>
+
     <section id="contact" class="section contact-section">
       <div class="container">
-        <h2 class="section-title centered"><span>06.</span> Get In Touch</h2>
+        <h2 class="section-title centered"><span>07.</span> Get In Touch</h2>
         <p class="contact-copy">
           I'm currently looking for new grad software engineering roles. If you've got a
           question, an opening on your team, or just want to say hi, my inbox is open.
@@ -174,7 +265,7 @@
         type="text"
         id="cmdkInput"
         class="cmdk-input"
-        placeholder="Type a command or search..."
+        placeholder="Type a command, or search projects..."
         autocomplete="off"
         spellcheck="false"
       />

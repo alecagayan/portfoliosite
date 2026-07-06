@@ -102,6 +102,45 @@ if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   tickTypewriter();
 }
 
+// Confetti burst on the "Say Hello" and "Download Resume" buttons
+function burstConfetti(x, y) {
+  const colors = ['#7c6dfa', '#b45cff', '#5846e6', '#9333ea', '#dbe0f5'];
+
+  for (let i = 0; i < 26; i++) {
+    const piece = document.createElement('span');
+    piece.className = 'confetti-piece';
+    piece.style.background = colors[i % colors.length];
+    piece.style.left = `${x}px`;
+    piece.style.top = `${y}px`;
+    document.body.appendChild(piece);
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 70 + Math.random() * 130;
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance - 40;
+    const rotation = Math.random() * 720 - 360;
+
+    const animation = piece.animate(
+      [
+        { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+        { transform: `translate(${dx}px, ${dy}px) rotate(${rotation}deg)`, opacity: 0 },
+      ],
+      { duration: 800 + Math.random() * 400, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }
+    );
+    animation.onfinish = () => piece.remove();
+  }
+}
+
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  document
+    .querySelectorAll('#contact .btn-primary, .hero-actions a[download]')
+    .forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        burstConfetti(e.clientX, e.clientY);
+      });
+    });
+}
+
 // Scrollspy nav: highlight the link for whichever section is in view
 const navLinks = [...document.querySelectorAll('.nav-links a')];
 const spySections = navLinks
@@ -155,7 +194,7 @@ const cmdkInput = document.getElementById('cmdkInput');
 const cmdkList = document.getElementById('cmdkList');
 const cmdkTrigger = document.getElementById('cmdkTrigger');
 
-const cmdkCommands = [
+const staticCmdkCommands = [
   ...navLinks.map((link) => ({
     label: `Go to ${link.textContent}`,
     hint: 'Section',
@@ -189,8 +228,15 @@ const cmdkCommands = [
   },
 ];
 
+// Populated once projects.json loads, so the palette doubles as a project search
+let projectCmdkCommands = [];
+
+function getCmdkCommands() {
+  return [...staticCmdkCommands, ...projectCmdkCommands];
+}
+
 let cmdkActiveIndex = 0;
-let cmdkFiltered = cmdkCommands;
+let cmdkFiltered = staticCmdkCommands;
 
 function renderCmdkList() {
   cmdkList.innerHTML = '';
@@ -234,9 +280,13 @@ function runCmdkCommand(cmd) {
 
 function filterCmdk(query) {
   const q = query.trim().toLowerCase();
+  const all = getCmdkCommands();
   cmdkFiltered = q
-    ? cmdkCommands.filter((cmd) => cmd.label.toLowerCase().includes(q))
-    : cmdkCommands;
+    ? all.filter(
+        (cmd) =>
+          cmd.label.toLowerCase().includes(q) || cmd.hint.toLowerCase().includes(q)
+      )
+    : all;
   cmdkActiveIndex = 0;
   renderCmdkList();
 }
@@ -451,7 +501,15 @@ function renderLinks(container, links) {
     a.href = link.url;
     a.textContent = link.label;
     a.setAttribute('aria-label', link.ariaLabel || `View ${link.label}`);
-    if (link.url && link.url !== '#') {
+    if (link.url && link.url !== '#' && link.url.startsWith('#')) {
+      // In-page section link (e.g. "#playground") - close the modal if it's
+      // open, then smooth-scroll instead of navigating/opening a new tab.
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (projectModal.open) closeProjectModal();
+        document.querySelector(link.url)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    } else if (link.url && link.url !== '#') {
       a.target = '_blank';
       a.rel = 'noopener';
     }
@@ -508,6 +566,16 @@ function renderProjects(projects) {
 
     projectsGrid.appendChild(card);
   });
+}
+
+// Feeds each project into the command palette as a searchable entry, so
+// typing a project name or tag (e.g. "Swift", "Keras") surfaces it there too.
+function buildProjectCommands(projects) {
+  projectCmdkCommands = projects.map((project) => ({
+    label: project.title,
+    hint: `Project · ${(project.tags || []).join(', ')}`,
+    action: () => openProjectModal(project),
+  }));
 }
 
 // Project detail modal
@@ -573,19 +641,24 @@ function initInteractions() {
       });
     });
 
-  // Subtle 3D tilt on project cards, and click-to-open the detail modal
-  projectCards.forEach((card, i) => {
+  // Subtle 3D tilt that follows the cursor
+  function addTiltEffect(card) {
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      const rotateX = ((y / rect.height) - 0.5) * -8;
-      const rotateY = ((x / rect.width) - 0.5) * 8;
-      card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+      const rotateX = ((y / rect.height) - 0.5) * -4;
+      const rotateY = ((x / rect.width) - 0.5) * 4;
+      card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-2px)`;
     });
     card.addEventListener('mouseleave', () => {
       card.style.transform = '';
     });
+  }
+
+  // Tilt, plus click-to-open the detail modal
+  projectCards.forEach((card, i) => {
+    addTiltEffect(card);
 
     card.tabIndex = 0;
     card.addEventListener('click', (e) => {
@@ -665,12 +738,289 @@ Promise.all([
     renderSkills(skills);
     renderCertifications(certifications);
     renderProjects(projects);
+    buildProjectCommands(projects);
     initInteractions();
   })
   .catch((err) => {
     console.error('Failed to load site data from the data/ folder', err);
     projectsGrid.innerHTML = '<p>Could not load projects right now.</p>';
   });
+
+// Skin lesion classifier: the real TensorFlow.js model from the Skin Cancer
+// Detection project (a CNN trained on HAM10000 dermatoscopic images), run as
+// client-side inference. tf.js is lazy-loaded from a CDN the first time it's
+// needed, same pattern as the three.js background.
+(() => {
+  const dropzone = document.getElementById('skinDropzone');
+  if (!dropzone) return;
+  const fileInput = document.getElementById('skinFileInput');
+  const preview = document.getElementById('skinPreview');
+  const dropzoneLabel = document.getElementById('skinDropzoneLabel');
+  const blurOverlay = document.getElementById('skinBlurOverlay');
+  const sampleBtn = document.getElementById('skinSample');
+  const clearBtn = document.getElementById('skinClear');
+  const statusEl = document.getElementById('skinStatus');
+  const resultBody = document.getElementById('skinResultBody');
+  const predictedEl = document.getElementById('skinPredicted');
+  const confidenceEl = document.getElementById('skinConfidence');
+  const barRows = {};
+  document.querySelectorAll('#skinBars .pg-bar-row').forEach((row) => {
+    barRows[row.dataset.code] = {
+      row,
+      fill: row.querySelector('.pg-bar > div'),
+      pct: row.querySelector('.pg-bar-pct'),
+    };
+  });
+
+  // Real HAM10000 dermatoscopic photos (via the ISIC Archive, CC-0) - blurred
+  // by default since medical lesion photos can be unpleasant to stumble on.
+  const sampleImages = Array.from(
+    { length: 18 },
+    (_, i) => `assets/skin-cancer-model/samples/lesion-${String(i + 1).padStart(2, '0')}.jpg`
+  );
+
+  const skinClasses = {
+    akiec: 'Actinic Keratoses',
+    bcc: 'Basal Cell Carcinoma',
+    bkl: 'Benign Keratosis',
+    df: 'Dermatofibroma',
+    mel: 'Melanoma',
+    nv: 'Melanocytic Nevi',
+    vasc: 'Vascular Lesion',
+  };
+  const classOrder = ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vasc'];
+  const isMalignant = { akiec: true, bcc: true, bkl: false, df: false, mel: true, nv: false, vasc: false };
+
+  let tfPromise = null;
+  function ensureTf() {
+    if (window.tf) return Promise.resolve();
+    if (!tfPromise) {
+      tfPromise = new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+    }
+    return tfPromise;
+  }
+
+  let model = null;
+  let modelPromise = null;
+  function loadModel() {
+    if (!modelPromise) {
+      modelPromise = ensureTf().then(() => tf.loadLayersModel('assets/skin-cancer-model/model.json'));
+    }
+    return modelPromise;
+  }
+
+  // Types text into an element one character at a time. A generation token
+  // lets a newer call cancel an in-flight one (e.g. rapid-fire shuffling).
+  let typewriterToken = 0;
+  function typewriteInto(el, text, speed, onDone) {
+    const token = ++typewriterToken;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = text;
+      el.classList.remove('is-typing');
+      if (onDone) onDone();
+      return;
+    }
+    el.textContent = '';
+    el.classList.add('is-typing');
+    let i = 0;
+    (function tick() {
+      if (token !== typewriterToken) return;
+      i++;
+      el.textContent = text.slice(0, i);
+      if (i < text.length) {
+        setTimeout(tick, speed);
+      } else {
+        el.classList.remove('is-typing');
+        if (onDone) onDone();
+      }
+    })();
+  }
+
+  function renderResults(ranked) {
+    statusEl.hidden = true;
+    resultBody.hidden = false;
+    resultBody.classList.remove('is-loading');
+
+    const top = ranked[0];
+    predictedEl.className = `pg-predicted${top.malignant ? ' is-malignant' : ''}`;
+    const labelText = `${top.label} (${top.malignant ? 'likely malignant' : 'likely benign'})`;
+    const confText = `${(top.prob * 100).toFixed(1)}% confident`;
+    typewriteInto(predictedEl, labelText, 16, () => {
+      typewriteInto(confidenceEl, confText, 16);
+    });
+
+    ranked.forEach((r) => {
+      const bar = barRows[r.code];
+      if (!bar) return;
+      bar.row.classList.toggle('is-top', r.code === top.code);
+      bar.fill.classList.toggle('is-malignant', r.malignant);
+      bar.fill.style.width = `${(r.prob * 100).toFixed(1)}%`;
+      bar.pct.textContent = `${(r.prob * 100).toFixed(0)}%`;
+    });
+  }
+
+  async function classifyImage(imgEl) {
+    const firstRun = resultBody.hidden;
+    if (firstRun) {
+      statusEl.hidden = false;
+      statusEl.textContent = model ? 'Analyzing...' : 'Loading model...';
+    } else {
+      resultBody.classList.add('is-loading');
+    }
+
+    try {
+      if (!model) model = await loadModel();
+    } catch (err) {
+      console.error('Failed to load the skin lesion model', err);
+      statusEl.hidden = false;
+      statusEl.textContent = 'Could not load the model (check your connection).';
+      resultBody.hidden = true;
+      return;
+    }
+
+    if (firstRun) statusEl.textContent = 'Analyzing...';
+
+    const predictionTensor = tf.tidy(() => {
+      const offset = tf.scalar(127.5);
+      const tensor = tf.browser
+        .fromPixels(imgEl)
+        .resizeNearestNeighbor([224, 224])
+        .toFloat()
+        .sub(offset)
+        .div(offset)
+        .expandDims();
+      return model.predict(tensor);
+    });
+    const data = await predictionTensor.data();
+    predictionTensor.dispose();
+
+    const ranked = classOrder
+      .map((code, i) => ({
+        code,
+        label: skinClasses[code],
+        prob: data[i],
+        malignant: isMalignant[code],
+      }))
+      .sort((a, b) => b.prob - a.prob);
+
+    renderResults(ranked);
+  }
+
+  // Whether the visitor has chosen to reveal a blurred image - once true, it
+  // stays true across new sample/upload requests until they re-blur one manually.
+  let revealed = false;
+
+  function showImage(url) {
+    preview.onload = () => classifyImage(preview);
+    preview.src = url;
+    preview.hidden = false;
+    preview.classList.toggle('is-blurred', !revealed);
+    blurOverlay.hidden = revealed;
+    dropzoneLabel.hidden = true;
+  }
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (file) showImage(URL.createObjectURL(file));
+  });
+
+  // Clicking the dropzone opens the file picker - except when the click lands
+  // on the reveal overlay (handled separately), or when an already-revealed
+  // image is clicked again, which re-blurs it instead. It's a plain div, not
+  // a <label>, so the blur overlay button can sit on top without also
+  // triggering the file dialog underneath it.
+  function reblur() {
+    revealed = false;
+    preview.classList.add('is-blurred');
+    blurOverlay.hidden = false;
+  }
+
+  dropzone.addEventListener('click', (e) => {
+    if (e.target.closest('#skinBlurOverlay')) return;
+    if (!preview.hidden && !preview.classList.contains('is-blurred')) {
+      reblur();
+      return;
+    }
+    fileInput.click();
+  });
+  dropzone.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.target.closest('#skinBlurOverlay')) return;
+    e.preventDefault();
+    if (!preview.hidden && !preview.classList.contains('is-blurred')) {
+      reblur();
+      return;
+    }
+    fileInput.click();
+  });
+
+  dropzone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropzone.classList.add('is-dragover');
+  });
+  dropzone.addEventListener('dragleave', () => {
+    dropzone.classList.remove('is-dragover');
+  });
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('is-dragover');
+    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) showImage(URL.createObjectURL(file));
+  });
+
+  blurOverlay.addEventListener('click', (e) => {
+    e.stopPropagation();
+    revealed = true;
+    preview.classList.remove('is-blurred');
+    blurOverlay.hidden = true;
+  });
+
+  sampleBtn.addEventListener('click', () => {
+    const pick = sampleImages[Math.floor(Math.random() * sampleImages.length)];
+    showImage(pick);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    preview.removeAttribute('src');
+    preview.hidden = true;
+    preview.classList.remove('is-blurred');
+    blurOverlay.hidden = true;
+    dropzoneLabel.hidden = false;
+    fileInput.value = '';
+    revealed = false;
+    typewriterToken++;
+    resultBody.hidden = true;
+    resultBody.classList.remove('is-loading');
+    statusEl.hidden = false;
+    statusEl.textContent = 'Upload a dermatoscopic image to classify it.';
+  });
+
+  // Show a blurred sample as soon as the Playground section scrolls into
+  // view, rather than an empty dropzone, without forcing every site visitor
+  // to download tf.js and the model up front - it only loads for visitors
+  // who actually scroll to this section.
+  const playgroundSection = document.getElementById('playground');
+  if (playgroundSection) {
+    const initObserver = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          obs.disconnect();
+          const pick = sampleImages[Math.floor(Math.random() * sampleImages.length)];
+          showImage(pick);
+        });
+      },
+      { threshold: 0.2 }
+    );
+    initObserver.observe(playgroundSection);
+  }
+})();
 
 // Lazily load the decorative three.js background after the page has settled,
 // so the initial load isn't blocked by a ~600KB library that's purely cosmetic.
