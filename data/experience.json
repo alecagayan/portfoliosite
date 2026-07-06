@@ -1,0 +1,24 @@
+[
+  {
+    "role": "Network Engineering Intern",
+    "company": "Visionary Solutions",
+    "location": "Herndon, VA",
+    "dates": "May 2025 - Aug 2025",
+    "bullets": [
+      "Assisted in configuring, monitoring, and troubleshooting enterprise networks, including routers, switches, and firewalls.",
+      "Applied CCNA coursework in subnetting, VLAN configuration, and routing protocols to support production environments.",
+      "Worked to develop a Python-based network monitoring tool to track network device status and performance metrics."
+    ]
+  },
+  {
+    "role": "Lead Instructor & Curriculum Developer",
+    "company": "Fairfax Collegiate",
+    "location": "Reston, VA",
+    "dates": "May 2022 - Aug 2025",
+    "bullets": [
+      "Taught elementary, middle, and high school students about engineering and provided individualized support.",
+      "Managed location inventory and coordinated logistics to ensure classroom materials were ready for use.",
+      "Developed curriculum for Python and Java courses designed for all ages, and implemented new technology in classes."
+    ]
+  }
+]

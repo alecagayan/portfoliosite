@@ -162,7 +162,7 @@
 
   const clock = new THREE.Clock();
 
-  // --- Konami code easter egg: ↑↑↓↓←→←→BA triggers a rainbow "party mode" ---
+  // --- Easter egg: ↑↑↓↓ triggers a rainbow "party mode" ---
   const originalColors = colors.slice();
   const colorAttr = particleGeometry.attributes.color;
   let partyMode = false;
@@ -173,11 +173,7 @@
     partyEndTime = clock.getElapsedTime() + 6;
   }
 
-  const konamiSequence = [
-    'arrowup', 'arrowup', 'arrowdown', 'arrowdown',
-    'arrowleft', 'arrowright', 'arrowleft', 'arrowright',
-    'b', 'a',
-  ];
+  const konamiSequence = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown'];
   let konamiProgress = 0;
   window.addEventListener('keydown', (e) => {
     const key = e.key.toLowerCase();

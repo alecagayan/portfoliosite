@@ -5,7 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alec Agayan · Software Engineer</title>
   <meta name="description" content="Portfolio of Alec Agayan, a recent Computer Science graduate and software engineer." />
-  <link rel="icon" href="data:,">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c6dfa'/%3E%3Cstop offset='1' stop-color='%23b45cff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='%230c0e1c'/%3E%3Ctext x='32' y='43' font-family='monospace' font-size='26' font-weight='700' fill='url(%23g)' text-anchor='middle'%3EAA%3C/text%3E%3C/svg%3E" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Alec Agayan · Software Engineer" />
+  <meta property="og:description" content="Portfolio of Alec Agayan, a recent Computer Science graduate and software engineer." />
+  <meta property="og:image" content="assets/DSC09847.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Alec Agayan · Software Engineer" />
+  <meta name="twitter:description" content="Portfolio of Alec Agayan, a recent Computer Science graduate and software engineer." />
+  <meta name="twitter:image" content="assets/DSC09847.jpg" />
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -17,13 +28,19 @@
       <nav>
         <ul class="nav-links">
           <li><a href="#about">About</a></li>
+          <li><a href="#experience">Experience</a></li>
           <li><a href="#skills">Skills</a></li>
           <li><a href="#projects">Projects</a></li>
           <li><a href="#certifications">Certifications</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+      <div class="nav-actions">
+        <button class="cmdk-trigger" id="cmdkTrigger" aria-label="Open command palette" title="Command palette (Ctrl/Cmd+K)">
+          <span>⌘K</span>
+        </button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+      </div>
     </div>
   </header>
 
@@ -31,6 +48,9 @@
     <section class="hero container">
       <p class="eyebrow">Hi, my name is</p>
       <h1>Alec Agayan<span class="accent-dot">.</span></h1>
+      <p class="hero-typewriter">
+        <span id="typewriterText"></span><span class="typewriter-cursor" aria-hidden="true"></span>
+      </p>
       <p class="hero-copy">
         I just graduated from the University of Maryland with a B.S. in Computer Science,
         focusing on machine learning. I like taking an idea and turning it into something
@@ -85,30 +105,51 @@
       </div>
     </section>
 
+    <section id="experience" class="section">
+      <div class="container">
+        <h2 class="section-title"><span>02.</span> Experience</h2>
+        <div class="experience-list" id="experienceList">
+          <div class="skeleton-card skeleton-experience-card"></div>
+          <div class="skeleton-card skeleton-experience-card"></div>
+        </div>
+      </div>
+    </section>
+
     <section id="skills" class="section">
       <div class="container">
-        <h2 class="section-title"><span>02.</span> Skills &amp; Languages</h2>
-        <div class="skills-grid" id="skillsGrid"></div>
+        <h2 class="section-title"><span>03.</span> Skills &amp; Languages</h2>
+        <div class="skills-grid" id="skillsGrid">
+          <div class="skeleton-card skeleton-skill-card"></div>
+          <div class="skeleton-card skeleton-skill-card"></div>
+          <div class="skeleton-card skeleton-skill-card"></div>
+        </div>
       </div>
     </section>
 
     <section id="projects" class="section">
       <div class="container">
-        <h2 class="section-title"><span>03.</span> Projects</h2>
-        <div class="projects-grid" id="projectsGrid"></div>
+        <h2 class="section-title"><span>04.</span> Projects</h2>
+        <div class="projects-grid" id="projectsGrid">
+          <div class="skeleton-card skeleton-project-card"></div>
+          <div class="skeleton-card skeleton-project-card"></div>
+          <div class="skeleton-card skeleton-project-card"></div>
+        </div>
       </div>
     </section>
 
     <section id="certifications" class="section">
       <div class="container">
-        <h2 class="section-title"><span>04.</span> Certifications</h2>
-        <div class="cert-grid" id="certGrid"></div>
+        <h2 class="section-title"><span>05.</span> Certifications</h2>
+        <div class="cert-grid" id="certGrid">
+          <div class="skeleton-card skeleton-cert-card"></div>
+          <div class="skeleton-card skeleton-cert-card"></div>
+        </div>
       </div>
     </section>
 
     <section id="contact" class="section contact-section">
       <div class="container">
-        <h2 class="section-title centered"><span>05.</span> Get In Touch</h2>
+        <h2 class="section-title centered"><span>06.</span> Get In Touch</h2>
         <p class="contact-copy">
           I'm currently looking for new grad software engineering roles. If you've got a
           question, an opening on your team, or just want to say hi, my inbox is open.
@@ -125,6 +166,21 @@
   </main>
 
   <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+  <dialog id="cmdk" class="cmdk">
+    <div class="cmdk-input-row">
+      <span class="cmdk-icon" aria-hidden="true">⌘</span>
+      <input
+        type="text"
+        id="cmdkInput"
+        class="cmdk-input"
+        placeholder="Type a command or search..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </div>
+    <ul class="cmdk-list" id="cmdkList"></ul>
+  </dialog>
 
   <dialog id="projectModal" class="project-modal">
     <button type="button" class="modal-close" id="modalClose" aria-label="Close">&times;</button>
@@ -143,8 +199,6 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-  <script src="three-scene.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
