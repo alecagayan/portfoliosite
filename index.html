@@ -19,6 +19,7 @@
           <li><a href="#about">About</a></li>
           <li><a href="#skills">Skills</a></li>
           <li><a href="#projects">Projects</a></li>
+          <li><a href="#certifications">Certifications</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </nav>
@@ -98,9 +99,16 @@
       </div>
     </section>
 
+    <section id="certifications" class="section">
+      <div class="container">
+        <h2 class="section-title"><span>04.</span> Certifications</h2>
+        <div class="cert-grid" id="certGrid"></div>
+      </div>
+    </section>
+
     <section id="contact" class="section contact-section">
       <div class="container">
-        <h2 class="section-title centered"><span>04.</span> Get In Touch</h2>
+        <h2 class="section-title centered"><span>05.</span> Get In Touch</h2>
         <p class="contact-copy">
           I'm currently looking for new grad software engineering roles. If you've got a
           question, an opening on your team, or just want to say hi, my inbox is open.
@@ -111,9 +119,23 @@
           <a href="https://linkedin.com/in/alecagayan" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a>
           <a href="mailto:alecagayan24@gmail.com" aria-label="Email">Email</a>
         </div>
+        <p class="local-time" id="localTime"></p>
       </div>
     </section>
   </main>
+
+  <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+  <dialog id="projectModal" class="project-modal">
+    <button type="button" class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    <div class="modal-top">
+      <span class="folder-icon" id="modalIcon" aria-hidden="true"></span>
+      <div class="project-links" id="modalLinks"></div>
+    </div>
+    <h3 id="modalTitle"></h3>
+    <p id="modalDetails"></p>
+    <ul class="tag-list small" id="modalTags"></ul>
+  </dialog>
 
   <footer class="footer">
     <div class="container">

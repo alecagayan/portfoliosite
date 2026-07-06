@@ -21,7 +21,9 @@
   const ACCENT = 0x7c6dfa;
   const ACCENT_2 = 0xb45cff;
   const PARTICLE_COUNT = window.innerWidth < 700 ? 90 : 180;
-  const SPREAD = 40;
+  // Widen the field on ultra-wide screens so particles reach into the empty
+  // gutters beside the centered content column instead of clustering in the middle.
+  const SPREAD = Math.max(40, window.innerWidth / 45);
   const LINK_DISTANCE = 7.5;
 
   // --- Particle field ---
@@ -91,6 +93,51 @@
   icosahedron.position.set(10, 2, -10);
   scene.add(icosahedron);
 
+  // --- Extra wireframe shapes drifting in the side gutters on wide screens ---
+  const gutterX = SPREAD * 0.85;
+  const floaters = [
+    {
+      mesh: new THREE.Mesh(
+        new THREE.OctahedronGeometry(6, 0),
+        new THREE.MeshBasicMaterial({ color: ACCENT_2, wireframe: true, transparent: true, opacity: 0.16 })
+      ),
+      position: [gutterX, -12, -14],
+      spin: [-0.04, 0.02, 0.01],
+      bob: { amp: 3, speed: 0.25, offset: 2 },
+    },
+    {
+      mesh: new THREE.Mesh(
+        new THREE.DodecahedronGeometry(4.5, 0),
+        new THREE.MeshBasicMaterial({ color: ACCENT, wireframe: true, transparent: true, opacity: 0.14 })
+      ),
+      position: [-gutterX * 0.75, -20, -22],
+      spin: [0.02, -0.03, 0.02],
+      bob: { amp: 2, speed: 0.4, offset: 4 },
+    },
+    {
+      mesh: new THREE.Mesh(
+        new THREE.TetrahedronGeometry(2.4, 0),
+        new THREE.MeshBasicMaterial({ color: ACCENT_2, wireframe: true, transparent: true, opacity: 0.15 })
+      ),
+      position: [-gutterX, 12, -18],
+      spin: [0.05, -0.04, 0.03],
+      bob: { amp: 1.6, speed: 0.5, offset: 1 },
+    },
+    {
+      mesh: new THREE.Mesh(
+        new THREE.IcosahedronGeometry(2, 0),
+        new THREE.MeshBasicMaterial({ color: ACCENT, wireframe: true, transparent: true, opacity: 0.15 })
+      ),
+      position: [-gutterX * 0.55, 0, -12],
+      spin: [-0.03, 0.05, -0.02],
+      bob: { amp: 1.4, speed: 0.6, offset: 3 },
+    },
+  ];
+  floaters.forEach(({ mesh, position }) => {
+    mesh.position.set(...position);
+    scene.add(mesh);
+  });
+
   // --- Mouse interaction ---
   const mouse = { x: 0, y: 0 };
   const targetRotation = { x: 0, y: 0 };
@@ -107,7 +154,41 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  // --- Scroll parallax: drift the whole field as the page scrolls ---
+  let scrollY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    scrollY = window.scrollY;
+  }, { passive: true });
+
   const clock = new THREE.Clock();
+
+  // --- Konami code easter egg: ↑↑↓↓←→←→BA triggers a rainbow "party mode" ---
+  const originalColors = colors.slice();
+  const colorAttr = particleGeometry.attributes.color;
+  let partyMode = false;
+  let partyEndTime = 0;
+
+  function triggerPartyMode() {
+    partyMode = true;
+    partyEndTime = clock.getElapsedTime() + 6;
+  }
+
+  const konamiSequence = [
+    'arrowup', 'arrowup', 'arrowdown', 'arrowdown',
+    'arrowleft', 'arrowright', 'arrowleft', 'arrowright',
+    'b', 'a',
+  ];
+  let konamiProgress = 0;
+  window.addEventListener('keydown', (e) => {
+    const key = e.key.toLowerCase();
+    konamiProgress = key === konamiSequence[konamiProgress]
+      ? konamiProgress + 1
+      : key === konamiSequence[0] ? 1 : 0;
+    if (konamiProgress === konamiSequence.length) {
+      konamiProgress = 0;
+      triggerPartyMode();
+    }
+  });
 
   function updateParticles() {
     const posAttr = particleGeometry.attributes.position;
@@ -146,22 +227,48 @@
 
   function animate() {
     requestAnimationFrame(animate);
-    const elapsed = clock.getElapsedTime();
+    const delta = clock.getDelta();
+    const elapsed = clock.elapsedTime;
 
     if (!prefersReducedMotion) {
       updateParticles();
     }
 
-    icosahedron.rotation.x = elapsed * 0.05;
-    icosahedron.rotation.y = elapsed * 0.08;
+    if (partyMode && elapsed > partyEndTime) {
+      partyMode = false;
+      colorAttr.array.set(originalColors);
+      colorAttr.needsUpdate = true;
+    } else if (partyMode) {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const hue = (i / PARTICLE_COUNT + elapsed * 0.15) % 1;
+        const c = new THREE.Color().setHSL(hue, 0.85, 0.6);
+        colorAttr.setXYZ(i, c.r, c.g, c.b);
+      }
+      colorAttr.needsUpdate = true;
+    }
+    const spinMultiplier = partyMode ? 8 : 1;
+
+    icosahedron.rotation.x += delta * 0.05 * spinMultiplier;
+    icosahedron.rotation.y += delta * 0.08 * spinMultiplier;
     icoMaterial.opacity = 0.16 + Math.sin(elapsed * 0.6) * 0.06;
+
+    // Slow independent spin plus a gentle bob for each gutter shape, nudged by scroll depth
+    const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight || 1;
+    const scrollProgress = Math.min(1, Math.max(0, scrollY / scrollableHeight));
+    const scrollFactor = scrollProgress * 14;
+    floaters.forEach(({ mesh, spin, bob }) => {
+      mesh.rotation.x += spin[0] * 0.02 * spinMultiplier;
+      mesh.rotation.y += spin[1] * 0.02 * spinMultiplier;
+      mesh.rotation.z += spin[2] * 0.02 * spinMultiplier;
+      mesh.position.y += Math.sin(elapsed * bob.speed + bob.offset) * 0.01;
+    });
 
     points.rotation.y += (targetRotation.y * 0.3 - points.rotation.y) * 0.02;
     points.rotation.x += (targetRotation.x * 0.3 - points.rotation.x) * 0.02;
     lines.rotation.copy(points.rotation);
 
     camera.position.x += (mouse.x * 3 - camera.position.x) * 0.02;
-    camera.position.y += (-mouse.y * 3 - camera.position.y) * 0.02;
+    camera.position.y += (-mouse.y * 3 - camera.position.y - scrollFactor) * 0.02;
     camera.lookAt(scene.position);
 
     renderer.render(scene, camera);
