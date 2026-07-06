@@ -1,0 +1,18 @@
+[
+  {
+    "category": "Languages",
+    "skills": ["Java", "Python", "JavaScript", "TypeScript", "C / C++", "SQL", "HTML & CSS"]
+  },
+  {
+    "category": "Frameworks & Libraries",
+    "skills": ["React", "Node.js", "Express", "Flask", "JUnit", "TensorFlow", "PyTorch", "Keras", "NumPy", "Pandas", "Scikit-learn"]
+  },
+  {
+    "category": "Tools & Technologies",
+    "skills": ["Git / GitHub", "Docker", "Linux", "PostgreSQL / MySQL", "MongoDB", "AWS EC2", "AWS S3", "AWS Lambda", "SageMaker", "Kinesis"]
+  },
+  {
+    "category": "Practices",
+    "skills": ["Data Structures & Algorithms", "REST APIs", "Agile / Scrum", "Unit Testing", "CI/CD"]
+  }
+]

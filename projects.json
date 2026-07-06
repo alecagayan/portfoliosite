@@ -1,0 +1,41 @@
+[
+  {
+    "title": "This Portfolio Site",
+    "description": "A responsive personal portfolio built from scratch with vanilla HTML, CSS, and JavaScript, including a dark mode toggle and a few scroll-based animations.",
+    "icon": "📁",
+    "tags": ["HTML", "CSS", "JavaScript"],
+    "links": [
+      { "label": "GitHub", "url": "#", "ariaLabel": "View source code on GitHub" },
+      { "label": "Live", "url": "#", "ariaLabel": "View live demo" }
+    ]
+  },
+  {
+    "title": "Charity Donation App",
+    "description": "An iOS donation app with a SwiftUI profile screen built from reusable components, backed by AWS Lambda and EC2 for file storage and backend logic. Built in Xcode using modern Swift practices.",
+    "icon": "📁",
+    "tags": ["Swift", "AWS Lambda", "EC2"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/spcoughlin/Giveo", "ariaLabel": "View source code on GitHub" }
+    ]
+  },
+  {
+    "title": "Attendance Tracker",
+    "description": "An attendance system with a Java REST API behind a React front-end, plus a companion iOS app in Swift that uses barcode scanning and biometric login to check students in.",
+    "icon": "📁",
+    "tags": ["React", "Java", "MySQL", "Swift"],
+    "links": [
+      { "label": "Frontend", "url": "https://github.com/alecagayan/checkpoint-client", "ariaLabel": "View frontend source code on GitHub" },
+      { "label": "Backend", "url": "https://github.com/alecagayan/checkpoint-server", "ariaLabel": "View backend source code on GitHub" },
+      { "label": "Live", "url": "https://mycheckpoint.org", "ariaLabel": "View live demo" }
+    ]
+  },
+  {
+    "title": "Skin Cancer Detection Model",
+    "description": "A convolutional neural network trained on 10,000+ images across 7 classes of skin lesions, reaching 89% classification accuracy after tuning the model.",
+    "icon": "📁",
+    "tags": ["Python", "Keras", "NumPy", "Pandas"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/alecagayan/skin-cancer", "ariaLabel": "View source code on GitHub" }
+    ]
+  }
+]
