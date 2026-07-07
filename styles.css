@@ -1568,6 +1568,30 @@ h1, h2, h3 {
   color: var(--accent);
 }
 
+/* Fractal explorer */
+.fr-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.fr-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  background: #05060c;
+  cursor: grab;
+  touch-action: none;
+}
+
+.fr-canvas:active {
+  cursor: grabbing;
+}
+
 /* Contact */
 .contact-section {
   text-align: center;

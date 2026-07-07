@@ -154,14 +154,15 @@
         <p class="playground-intro">
           A few small things I built from scratch to play around with in the browser: the skin
           lesion classifier from my <a href="#projects">Skin Cancer Detection project</a>, a
-          Connect Four AI, and a Huffman coding compressor. No servers involved, it all runs
-          right here on the page.
+          Connect Four AI, a Huffman coding compressor, and a real-time fractal renderer. No
+          servers involved, it all runs right here on the page.
         </p>
 
         <div class="playground-tabs" role="tablist">
           <button type="button" class="playground-tab is-active" id="tabSkin" data-panel="panelSkin" role="tab" aria-selected="true">Skin Lesion Classifier</button>
           <button type="button" class="playground-tab" id="tabConnect4" data-panel="panelConnect4" role="tab" aria-selected="false">Connect Four AI</button>
           <button type="button" class="playground-tab" id="tabHuffman" data-panel="panelHuffman" role="tab" aria-selected="false">Huffman Coding</button>
+          <button type="button" class="playground-tab" id="tabFractal" data-panel="panelFractal" role="tab" aria-selected="false">Fractal Explorer</button>
           <span class="playground-tab-indicator" id="playgroundTabIndicator" aria-hidden="true"></span>
         </div>
 
@@ -300,6 +301,33 @@
               <p class="huf-verify" id="hufVerify"></p>
             </div>
           </div>
+        </div>
+
+        <div class="playground-panel" id="panelFractal" role="tabpanel">
+          <p class="playground-desc">
+            A real-time Mandelbrot and Julia set renderer. Raw WebGL and a hand-written GLSL
+            shader run the escape-time iteration on every pixel, on the GPU, every frame. Scroll
+            or pinch to zoom, drag to pan.
+          </p>
+          <div class="fr-controls">
+            <div class="dd" id="frPresetDD">
+              <button type="button" class="dd-trigger" id="frPresetTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <span id="frPresetLabel">Mandelbrot</span>
+                <svg class="dd-caret" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 7l5 5 5-5" />
+                </svg>
+              </button>
+              <ul class="dd-menu" id="frPresetMenu" role="listbox" aria-label="Fractal preset">
+                <li role="option" data-value="mandelbrot" tabindex="-1" class="is-selected" aria-selected="true">Mandelbrot</li>
+                <li role="option" data-value="julia-spiral" tabindex="-1">Julia - Spiral</li>
+                <li role="option" data-value="julia-rabbit" tabindex="-1">Julia - Rabbit</li>
+                <li role="option" data-value="julia-feather" tabindex="-1">Julia - Feather</li>
+              </ul>
+            </div>
+            <button type="button" id="frReset" class="btn btn-secondary btn-small">Reset View</button>
+          </div>
+          <canvas id="frCanvas" class="fr-canvas" aria-label="Fractal render"></canvas>
+          <p class="pg-status" id="frStatus">Scroll or pinch to zoom, drag to pan.</p>
         </div>
       </div>
     </section>

@@ -1098,12 +1098,13 @@ window.addEventListener('resize', () => {
 
 // Custom dropdown - a plain <select>'s popup can't be styled or animated, so
 // this is a small button + listbox instead, with a springy pop-open transition.
-(() => {
-  const dd = document.getElementById('c4DifficultyDD');
-  if (!dd) return;
-  const trigger = document.getElementById('c4DifficultyTrigger');
-  const label = document.getElementById('c4DifficultyLabel');
-  const menu = document.getElementById('c4DifficultyMenu');
+// Reused for every dropdown on the page (Connect Four difficulty, fractal presets, ...).
+function initDropdown(ddId, triggerId, labelId, menuId) {
+  const dd = document.getElementById(ddId);
+  if (!dd) return null;
+  const trigger = document.getElementById(triggerId);
+  const label = document.getElementById(labelId);
+  const menu = document.getElementById(menuId);
   const options = [...menu.querySelectorAll('li')];
 
   let value = (options.find((o) => o.classList.contains('is-selected')) || options[0]).dataset.value;
@@ -1166,7 +1167,11 @@ window.addEventListener('resize', () => {
   });
 
   dd.getValue = () => value;
-})();
+  return dd;
+}
+
+initDropdown('c4DifficultyDD', 'c4DifficultyTrigger', 'c4DifficultyLabel', 'c4DifficultyMenu');
+initDropdown('frPresetDD', 'frPresetTrigger', 'frPresetLabel', 'frPresetMenu');
 
 // Connect Four AI: a depth-limited minimax search with alpha-beta pruning and
 // a hand-tuned heuristic evaluation - no external chess/game engine, just
@@ -1688,6 +1693,304 @@ window.addEventListener('resize', () => {
   });
 
   compress();
+})();
+
+// Fractal explorer: a real-time Mandelbrot/Julia renderer. Raw WebGL, a
+// hand-written GLSL fragment shader does escape-time iteration per pixel on
+// the GPU every frame - no plotting library, no canvas 2D pixel pushing.
+(() => {
+  const canvas = document.getElementById('frCanvas');
+  if (!canvas) return;
+  const resetBtn = document.getElementById('frReset');
+  const statusEl = document.getElementById('frStatus');
+  const presetDD = document.getElementById('frPresetDD');
+
+  const gl =
+    canvas.getContext('webgl', { antialias: true }) || canvas.getContext('experimental-webgl', { antialias: true });
+  if (!gl) {
+    statusEl.textContent = 'WebGL is not available in this browser.';
+    return;
+  }
+
+  const vertexSrc = `
+    attribute vec2 aPosition;
+    void main() {
+      gl_Position = vec4(aPosition, 0.0, 1.0);
+    }
+  `;
+
+  const fragmentSrc = `
+    precision highp float;
+
+    uniform vec2 uResolution;
+    uniform vec2 uCenter;
+    uniform float uZoom;
+    uniform float uMaxIter;
+    uniform float uJulia;
+    uniform vec2 uJuliaC;
+    uniform vec3 uColorA;
+    uniform vec3 uColorB;
+    uniform float uColorShift;
+
+    vec2 complexSquare(vec2 z) {
+      return vec2(z.x * z.x - z.y * z.y, 2.0 * z.x * z.y);
+    }
+
+    void main() {
+      vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+      vec2 c = uCenter + uv / uZoom;
+
+      vec2 z = uJulia > 0.5 ? c : vec2(0.0);
+      vec2 k = uJulia > 0.5 ? uJuliaC : c;
+
+      float iter = 0.0;
+      for (int i = 0; i < 500; i++) {
+        if (float(i) >= uMaxIter) break;
+        z = complexSquare(z) + k;
+        if (dot(z, z) > 4.0) break;
+        iter += 1.0;
+      }
+
+      if (iter >= uMaxIter - 1.0) {
+        gl_FragColor = vec4(0.02, 0.02, 0.05, 1.0);
+      } else {
+        // Smooth (continuous) escape-time so color bands don't look stair-stepped
+        float logZn = log(dot(z, z)) / 2.0;
+        float nu = log(logZn / log(2.0)) / log(2.0);
+        float smoothIter = iter + 1.0 - nu;
+
+        float t = fract(smoothIter * 0.06 + uColorShift);
+        vec3 col = mix(uColorA, uColorB, t);
+        col *= 0.65 + 0.35 * sin(smoothIter * 0.18);
+        gl_FragColor = vec4(col, 1.0);
+      }
+    }
+  `;
+
+  function compileShader(type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      console.error(gl.getShaderInfoLog(shader));
+      gl.deleteShader(shader);
+      return null;
+    }
+    return shader;
+  }
+
+  const vertexShader = compileShader(gl.VERTEX_SHADER, vertexSrc);
+  const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentSrc);
+  if (!vertexShader || !fragmentShader) return;
+
+  const program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.error(gl.getProgramInfoLog(program));
+    return;
+  }
+  gl.useProgram(program);
+
+  const positionBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const aPosition = gl.getAttribLocation(program, 'aPosition');
+  gl.enableVertexAttribArray(aPosition);
+  gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+
+  const uResolution = gl.getUniformLocation(program, 'uResolution');
+  const uCenter = gl.getUniformLocation(program, 'uCenter');
+  const uZoom = gl.getUniformLocation(program, 'uZoom');
+  const uMaxIter = gl.getUniformLocation(program, 'uMaxIter');
+  const uJulia = gl.getUniformLocation(program, 'uJulia');
+  const uJuliaC = gl.getUniformLocation(program, 'uJuliaC');
+  const uColorA = gl.getUniformLocation(program, 'uColorA');
+  const uColorB = gl.getUniformLocation(program, 'uColorB');
+  const uColorShift = gl.getUniformLocation(program, 'uColorShift');
+
+  function hexToRgb01(hex) {
+    const h = hex.trim().replace('#', '');
+    const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+    const n = parseInt(full, 16);
+    return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  }
+
+  let colorA = [0.486, 0.427, 0.98];
+  let colorB = [0.706, 0.361, 1.0];
+  function readThemeColors() {
+    const styles = getComputedStyle(document.documentElement);
+    colorA = hexToRgb01(styles.getPropertyValue('--accent'));
+    colorB = hexToRgb01(styles.getPropertyValue('--accent-2'));
+  }
+  readThemeColors();
+  new MutationObserver(readThemeColors).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  });
+
+  const PRESETS = {
+    mandelbrot: { julia: false, c: [0, 0], center: [-0.5, 0], zoom: 1 },
+    'julia-spiral': { julia: true, c: [-0.7, 0.27015], center: [0, 0], zoom: 0.6 },
+    'julia-rabbit': { julia: true, c: [-0.8, 0.156], center: [0, 0], zoom: 0.6 },
+    'julia-feather': { julia: true, c: [0.285, 0.01], center: [0, 0], zoom: 0.6 },
+  };
+
+  let preset = PRESETS.mandelbrot;
+  let center = [...preset.center];
+  let zoom = preset.zoom;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let colorShift = 0;
+
+  function currentMaxIter() {
+    return Math.min(500, 80 + Math.floor(40 * Math.log2(Math.max(1, zoom))));
+  }
+
+  function updateStatus() {
+    const zoomLabel = zoom >= 1000 ? `${zoom.toExponential(1)}x` : `${zoom.toFixed(1)}x`;
+    statusEl.textContent = `Zoom: ${zoomLabel} · Scroll or pinch to zoom, drag to pan.`;
+  }
+
+  function draw() {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
+    gl.uniform2f(uResolution, canvas.width, canvas.height);
+    gl.uniform2f(uCenter, center[0], center[1]);
+    gl.uniform1f(uZoom, zoom);
+    gl.uniform1f(uMaxIter, currentMaxIter());
+    gl.uniform1f(uJulia, preset.julia ? 1 : 0);
+    gl.uniform2f(uJuliaC, preset.c[0], preset.c[1]);
+    gl.uniform3f(uColorA, colorA[0], colorA[1], colorA[2]);
+    gl.uniform3f(uColorB, colorB[0], colorB[1], colorB[2]);
+    gl.uniform1f(uColorShift, colorShift);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    updateStatus();
+  }
+
+  // Converts a point in canvas CSS pixels to the complex-plane coordinate it
+  // represents - has to mirror the shader's uv/center/zoom math exactly.
+  function screenToComplex(px, py, rect) {
+    const uvX = (px - rect.width / 2) / rect.height;
+    const uvY = (rect.height / 2 - py) / rect.height;
+    return [center[0] + uvX / zoom, center[1] + uvY / zoom];
+  }
+
+  function applyPreset(key) {
+    preset = PRESETS[key] || PRESETS.mandelbrot;
+    center = [...preset.center];
+    zoom = preset.zoom;
+    draw();
+  }
+
+  resetBtn.addEventListener('click', () => {
+    center = [...preset.center];
+    zoom = preset.zoom;
+    draw();
+  });
+
+  presetDD?.addEventListener('dd-change', (e) => applyPreset(e.detail.value));
+
+  // Pan (single pointer) and pinch-zoom (two pointers), unified via Pointer Events.
+  const activePointers = new Map();
+  let lastSingle = null;
+  let lastPinchDist = null;
+
+  canvas.addEventListener('pointerdown', (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (activePointers.size === 1) lastSingle = { x: e.clientX, y: e.clientY };
+    if (activePointers.size === 2) lastPinchDist = null;
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const rect = canvas.getBoundingClientRect();
+
+    if (activePointers.size === 1 && lastSingle) {
+      const curr = { x: e.clientX, y: e.clientY };
+      const prevC = screenToComplex(lastSingle.x - rect.left, lastSingle.y - rect.top, rect);
+      const currC = screenToComplex(curr.x - rect.left, curr.y - rect.top, rect);
+      center[0] -= currC[0] - prevC[0];
+      center[1] -= currC[1] - prevC[1];
+      lastSingle = curr;
+      draw();
+    } else if (activePointers.size === 2) {
+      const pts = [...activePointers.values()];
+      const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      const midX = (pts[0].x + pts[1].x) / 2 - rect.left;
+      const midY = (pts[0].y + pts[1].y) / 2 - rect.top;
+      if (lastPinchDist != null) {
+        const before = screenToComplex(midX, midY, rect);
+        zoom = Math.min(Math.max(zoom * (dist / lastPinchDist), 0.3), 1e6);
+        const after = screenToComplex(midX, midY, rect);
+        center[0] += before[0] - after[0];
+        center[1] += before[1] - after[1];
+        draw();
+      }
+      lastPinchDist = dist;
+    }
+  });
+
+  function releasePointer(e) {
+    activePointers.delete(e.pointerId);
+    lastPinchDist = null;
+    lastSingle = activePointers.size === 1 ? [...activePointers.values()][0] : null;
+  }
+  canvas.addEventListener('pointerup', releasePointer);
+  canvas.addEventListener('pointercancel', releasePointer);
+
+  canvas.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const px = e.clientX - rect.left;
+      const py = e.clientY - rect.top;
+      const before = screenToComplex(px, py, rect);
+      zoom = Math.min(Math.max(zoom * Math.exp(-e.deltaY * 0.0015), 0.3), 1e6);
+      const after = screenToComplex(px, py, rect);
+      center[0] += before[0] - after[0];
+      center[1] += before[1] - after[1];
+      draw();
+    },
+    { passive: false }
+  );
+
+  window.addEventListener('resize', draw);
+
+  // Only animate the ambient color drift while this tab is actually visible -
+  // otherwise it'd keep rendering forever in the background after switching away.
+  const panelEl = document.getElementById('panelFractal');
+  let driftRunning = false;
+  function startDrift() {
+    if (driftRunning || prefersReducedMotion) return;
+    driftRunning = true;
+    (function step() {
+      if (!panelEl || !panelEl.classList.contains('is-active')) {
+        driftRunning = false;
+        return;
+      }
+      colorShift += 0.0015;
+      draw();
+      requestAnimationFrame(step);
+    })();
+  }
+
+  panelEl?.addEventListener('pg-shown', () => {
+    draw();
+    startDrift();
+  });
+
+  draw();
+  if (panelEl?.classList.contains('is-active')) startDrift();
 })();
 
 // Lazily load the decorative WebGL shader background after the page has
