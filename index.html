@@ -152,23 +152,25 @@
       <div class="container">
         <h2 class="section-title"><span>06.</span> Playground</h2>
         <p class="playground-intro">
-          Two small demos built from scratch: the skin lesion classifier from my
-          <a href="#projects">Skin Cancer Detection project</a>, and a neural network that trains
-          live in your browser - both running entirely client-side.
+          A few small things I built from scratch to play around with in the browser: the skin
+          lesion classifier from my <a href="#projects">Skin Cancer Detection project</a>, a
+          Connect Four AI, and a Huffman coding compressor. No servers involved, it all runs
+          right here on the page.
         </p>
 
         <div class="playground-tabs" role="tablist">
           <button type="button" class="playground-tab is-active" id="tabSkin" data-panel="panelSkin" role="tab" aria-selected="true">Skin Lesion Classifier</button>
-          <button type="button" class="playground-tab" id="tabNN" data-panel="panelNN" role="tab" aria-selected="false">Neural Network Playground</button>
+          <button type="button" class="playground-tab" id="tabConnect4" data-panel="panelConnect4" role="tab" aria-selected="false">Connect Four AI</button>
+          <button type="button" class="playground-tab" id="tabHuffman" data-panel="panelHuffman" role="tab" aria-selected="false">Huffman Coding</button>
         </div>
 
         <div class="playground-panel is-active" id="panelSkin" role="tabpanel">
           <p class="playground-desc">
-            A convolutional neural network trained on the <strong>HAM10000</strong> dermatoscopic
-            image dataset (7 lesion classes), running as a TensorFlow.js model directly in your
-            browser - the same model from my Skin Cancer Detection project. Upload a photo of a
-            skin lesion, or try a random sample image (blurred by default, since real lesion
-            photos aren't for everyone - click to reveal).
+            This is the actual model from my Skin Cancer Detection project, a CNN trained on the
+            <strong>HAM10000</strong> dataset to sort dermatoscopic images into 7 lesion types. It
+            runs right here in your browser through TensorFlow.js. Upload a photo of a skin
+            lesion, or grab a random sample below (blurred by default since lesion photos aren't
+            for everyone, click it if you want to actually see the image).
           </p>
           <div class="skin-demo">
             <div class="skin-upload-wrap">
@@ -239,36 +241,64 @@
               </div>
             </div>
           </div>
-          <p class="skin-disclaimer">For demonstration only - not a medical device, and not a substitute for a dermatologist.</p>
+          <p class="skin-disclaimer">Just a demo. Not a medical device, and not a substitute for seeing a dermatologist.</p>
         </div>
 
-        <div class="playground-panel" id="panelNN" role="tabpanel">
+        <div class="playground-panel" id="panelConnect4" role="tabpanel">
           <p class="playground-desc">
-            A tiny neural network (2 &rarr; 8 &rarr; 8 &rarr; 1) with forward and backward passes
-            written by hand in plain JavaScript - no TensorFlow here. Pick a dataset and watch it
-            learn the decision boundary live, via real gradient descent.
+            Play Connect Four against an AI I wrote myself. It searches the game tree with
+            <strong>minimax and alpha-beta pruning</strong>, scoring positions several moves ahead
+            using a heuristic I tuned by hand. No chess engine, no library, just plain JavaScript.
           </p>
-          <div class="nn-controls">
-            <select id="nnDataset" aria-label="Dataset">
-              <option value="xor">XOR</option>
-              <option value="circles">Circles</option>
-              <option value="spiral">Spiral</option>
-            </select>
-            <button type="button" id="nnTrain" class="btn btn-primary btn-small">Train</button>
-            <button type="button" id="nnReset" class="btn btn-secondary btn-small">Reset</button>
-            <label class="nn-lr-label">
-              Learning rate
-              <input type="range" id="nnLr" min="0.05" max="2" step="0.05" value="0.8" />
-            </label>
+          <div class="c4-controls">
+            <div class="dd" id="c4DifficultyDD">
+              <button type="button" class="dd-trigger" id="c4DifficultyTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <span id="c4DifficultyLabel">Medium</span>
+                <svg class="dd-caret" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 7l5 5 5-5" />
+                </svg>
+              </button>
+              <ul class="dd-menu" id="c4DifficultyMenu" role="listbox" aria-label="Difficulty">
+                <li role="option" data-value="2" tabindex="-1">Easy</li>
+                <li role="option" data-value="4" tabindex="-1" class="is-selected" aria-selected="true">Medium</li>
+                <li role="option" data-value="6" tabindex="-1">Hard</li>
+              </ul>
+            </div>
+            <button type="button" id="c4Reset" class="btn btn-secondary btn-small">New Game</button>
           </div>
-          <div class="nn-demo">
-            <canvas id="nnCanvas" class="nn-canvas" aria-label="Decision boundary visualization"></canvas>
-            <div class="nn-legend">
-              <span><i class="nn-dot nn-dot-a"></i> Class A</span>
-              <span><i class="nn-dot nn-dot-b"></i> Class B</span>
+          <div class="c4-board" id="c4Board" role="grid" aria-label="Connect Four board"></div>
+          <p class="pg-status" id="c4Status">Your turn - click a column to drop a disc.</p>
+        </div>
+
+        <div class="playground-panel" id="panelHuffman" role="tabpanel">
+          <p class="playground-desc">
+            A working Huffman coding compressor. It builds an optimal prefix-code tree using a
+            min-heap I wrote from scratch, encodes your text down to actual bits, then decodes it
+            back to prove nothing got lost along the way.
+          </p>
+          <div class="huf-controls">
+            <textarea id="hufInput" class="huf-input" rows="3" maxlength="400">the quick brown fox jumps over the lazy dog</textarea>
+            <div class="huf-actions">
+              <button type="button" id="hufCompress" class="btn btn-primary btn-small">Compress</button>
+              <button type="button" id="hufSample" class="btn btn-secondary btn-small">Sample Text</button>
             </div>
           </div>
-          <p class="nn-status" id="nnStatus">Click Train to start learning.</p>
+          <div class="huf-results" id="hufResults">
+            <p class="pg-placeholder" id="hufStatus">Enter some text and click Compress.</p>
+            <div class="huf-body" id="hufBody" hidden>
+              <div class="huf-stats" id="hufStats"></div>
+              <canvas id="hufTreeCanvas" class="huf-tree-canvas" aria-label="Huffman tree diagram"></canvas>
+              <div class="huf-table-wrap">
+                <table class="huf-table" id="hufTable">
+                  <thead>
+                    <tr><th>Char</th><th>Freq</th><th>Code</th></tr>
+                  </thead>
+                  <tbody id="hufTableBody"></tbody>
+                </table>
+              </div>
+              <p class="huf-verify" id="hufVerify"></p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

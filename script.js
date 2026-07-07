@@ -702,14 +702,14 @@ function initInteractions() {
     tag.classList.add('linked');
 
     const activate = () => {
-      document
-        .getElementById('projects')
-        .scrollIntoView({ behavior: 'smooth', block: 'start' });
-
       clearTimeout(filterTimeout);
       projectCards.forEach((card) => card.classList.remove('tech-match'));
       matches.forEach((card) => card.classList.add('tech-match'));
       projectsGrid.classList.add('filtering');
+
+      // Scroll to the first matching project card itself, not just the
+      // section - with several projects, "start" could land well above it.
+      matches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
 
       filterTimeout = setTimeout(() => {
         projectsGrid.classList.remove('filtering');
@@ -1039,289 +1039,599 @@ playgroundTabs.forEach((tab) => {
   }
 })();
 
-// Neural network playground: a tiny 2-8-8-1 MLP with forward and backward
-// passes written by hand (no TensorFlow) that trains live in the browser via
-// full-batch gradient descent, rendering its decision boundary as it learns.
+
+// Custom dropdown - a plain <select>'s popup can't be styled or animated, so
+// this is a small button + listbox instead, with a springy pop-open transition.
 (() => {
-  const canvas = document.getElementById('nnCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const datasetSelect = document.getElementById('nnDataset');
-  const trainBtn = document.getElementById('nnTrain');
-  const resetBtn = document.getElementById('nnReset');
-  const lrSlider = document.getElementById('nnLr');
-  const statusEl = document.getElementById('nnStatus');
+  const dd = document.getElementById('c4DifficultyDD');
+  if (!dd) return;
+  const trigger = document.getElementById('c4DifficultyTrigger');
+  const label = document.getElementById('c4DifficultyLabel');
+  const menu = document.getElementById('c4DifficultyMenu');
+  const options = [...menu.querySelectorAll('li')];
 
-  const ARCH = { in: 2, h1: 8, h2: 8, out: 1 };
+  let value = (options.find((o) => o.classList.contains('is-selected')) || options[0]).dataset.value;
 
-  function clamp(v) {
-    return Math.max(-1, Math.min(1, v));
+  function openMenu() {
+    menu.classList.add('is-open');
+    trigger.setAttribute('aria-expanded', 'true');
   }
 
-  function makeMatrix(rows, cols, fn) {
-    return Array.from({ length: rows }, () => Array.from({ length: cols }, fn));
+  function closeMenu() {
+    menu.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded', 'false');
   }
 
-  function createNetwork() {
-    const initFor = (fanIn) => () => (Math.random() * 2 - 1) * Math.sqrt(1 / fanIn);
-    return {
-      W1: makeMatrix(ARCH.in, ARCH.h1, initFor(ARCH.in)),
-      b1: Array(ARCH.h1).fill(0),
-      W2: makeMatrix(ARCH.h1, ARCH.h2, initFor(ARCH.h1)),
-      b2: Array(ARCH.h2).fill(0),
-      W3: makeMatrix(ARCH.h2, ARCH.out, initFor(ARCH.h2)),
-      b3: Array(ARCH.out).fill(0),
-    };
+  function selectOption(opt) {
+    value = opt.dataset.value;
+    label.textContent = opt.textContent;
+    options.forEach((o) => {
+      o.classList.toggle('is-selected', o === opt);
+      o.setAttribute('aria-selected', o === opt ? 'true' : 'false');
+    });
+    closeMenu();
+    trigger.focus();
+    dd.dispatchEvent(new CustomEvent('dd-change', { detail: { value } }));
   }
 
-  function sigmoid(x) {
-    return 1 / (1 + Math.exp(-x));
-  }
+  trigger.addEventListener('click', () => {
+    menu.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
 
-  // Forward pass for a single (x, y) point - tanh hidden layers, sigmoid output.
-  function forward(net, x0, x1) {
-    const a1 = new Array(ARCH.h1);
-    for (let j = 0; j < ARCH.h1; j++) {
-      a1[j] = Math.tanh(x0 * net.W1[0][j] + x1 * net.W1[1][j] + net.b1[j]);
+  trigger.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      openMenu();
+      (options.find((o) => o.classList.contains('is-selected')) || options[0]).focus();
     }
-    const a2 = new Array(ARCH.h2);
-    for (let k = 0; k < ARCH.h2; k++) {
-      let sum = net.b2[k];
-      for (let j = 0; j < ARCH.h1; j++) sum += a1[j] * net.W2[j][k];
-      a2[k] = Math.tanh(sum);
-    }
-    let z3 = net.b3[0];
-    for (let k = 0; k < ARCH.h2; k++) z3 += a2[k] * net.W3[k][0];
-    return { a1, a2, yhat: sigmoid(z3) };
-  }
+  });
 
-  // One full-batch gradient-descent step (backprop by hand) over all points.
-  function trainStep(net, points, lr) {
-    const gW1 = makeMatrix(ARCH.in, ARCH.h1, () => 0);
-    const gb1 = Array(ARCH.h1).fill(0);
-    const gW2 = makeMatrix(ARCH.h1, ARCH.h2, () => 0);
-    const gb2 = Array(ARCH.h2).fill(0);
-    const gW3 = makeMatrix(ARCH.h2, ARCH.out, () => 0);
-    const gb3 = Array(ARCH.out).fill(0);
-
-    let totalLoss = 0;
-    const eps = 1e-9;
-
-    points.forEach((p) => {
-      const { a1, a2, yhat } = forward(net, p.x, p.y);
-      const y = p.label;
-      totalLoss += -(y * Math.log(yhat + eps) + (1 - y) * Math.log(1 - yhat + eps));
-
-      const dz3 = yhat - y;
-      for (let k = 0; k < ARCH.h2; k++) gW3[k][0] += a2[k] * dz3;
-      gb3[0] += dz3;
-
-      const dz2 = new Array(ARCH.h2);
-      for (let k = 0; k < ARCH.h2; k++) {
-        const da2 = dz3 * net.W3[k][0];
-        dz2[k] = da2 * (1 - a2[k] * a2[k]);
-      }
-      for (let j = 0; j < ARCH.h1; j++) {
-        for (let k = 0; k < ARCH.h2; k++) gW2[j][k] += a1[j] * dz2[k];
-      }
-      for (let k = 0; k < ARCH.h2; k++) gb2[k] += dz2[k];
-
-      const dz1 = new Array(ARCH.h1);
-      for (let j = 0; j < ARCH.h1; j++) {
-        let da1 = 0;
-        for (let k = 0; k < ARCH.h2; k++) da1 += dz2[k] * net.W2[j][k];
-        dz1[j] = da1 * (1 - a1[j] * a1[j]);
-      }
-      for (let j = 0; j < ARCH.h1; j++) {
-        gW1[0][j] += p.x * dz1[j];
-        gW1[1][j] += p.y * dz1[j];
-        gb1[j] += dz1[j];
+  options.forEach((opt, i) => {
+    opt.addEventListener('click', () => selectOption(opt));
+    opt.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectOption(opt);
+      } else if (e.key === 'Escape') {
+        closeMenu();
+        trigger.focus();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        (options[i + 1] || options[0]).focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        (options[i - 1] || options[options.length - 1]).focus();
       }
     });
+  });
 
-    const n = points.length;
-    for (let i = 0; i < ARCH.in; i++)
-      for (let j = 0; j < ARCH.h1; j++) net.W1[i][j] -= (lr * gW1[i][j]) / n;
-    for (let j = 0; j < ARCH.h1; j++) net.b1[j] -= (lr * gb1[j]) / n;
-    for (let j = 0; j < ARCH.h1; j++)
-      for (let k = 0; k < ARCH.h2; k++) net.W2[j][k] -= (lr * gW2[j][k]) / n;
-    for (let k = 0; k < ARCH.h2; k++) net.b2[k] -= (lr * gb2[k]) / n;
-    for (let k = 0; k < ARCH.h2; k++) net.W3[k][0] -= (lr * gW3[k][0]) / n;
-    net.b3[0] -= (lr * gb3[0]) / n;
+  document.addEventListener('click', (e) => {
+    if (!dd.contains(e.target)) closeMenu();
+  });
 
-    return totalLoss / n;
+  dd.getValue = () => value;
+})();
+
+// Connect Four AI: a depth-limited minimax search with alpha-beta pruning and
+// a hand-tuned heuristic evaluation - no external chess/game engine, just
+// plain JavaScript searching the game tree several moves ahead.
+(() => {
+  const boardEl = document.getElementById('c4Board');
+  if (!boardEl) return;
+  const difficultyDD = document.getElementById('c4DifficultyDD');
+  const resetBtn = document.getElementById('c4Reset');
+  const statusEl = document.getElementById('c4Status');
+
+  const ROWS = 6;
+  const COLS = 7;
+  const EMPTY = 0;
+  const PLAYER = 1;
+  const AI = 2;
+
+  function createBoard() {
+    return Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY));
   }
 
-  // Synthetic 2D datasets, generated in [-1, 1] x [-1, 1].
-  function generateXOR(n = 220) {
-    const pts = [];
-    while (pts.length < n) {
-      const x = Math.random() * 2 - 1;
-      const y = Math.random() * 2 - 1;
-      if (Math.abs(x) < 0.1 || Math.abs(y) < 0.1) continue;
-      pts.push({ x, y, label: (x > 0) === (y > 0) ? 0 : 1 });
-    }
-    return pts;
+  function validColumns(board) {
+    const cols = [];
+    for (let c = 0; c < COLS; c++) if (board[0][c] === EMPTY) cols.push(c);
+    return cols;
   }
 
-  function generateCircles(n = 220) {
-    const pts = [];
-    for (let i = 0; i < n; i++) {
-      const label = i % 2;
-      const angle = Math.random() * Math.PI * 2;
-      const radius = label === 0 ? Math.random() * 0.35 : 0.65 + Math.random() * 0.3;
-      const noise = 0.04;
-      pts.push({
-        x: clamp(Math.cos(angle) * radius + (Math.random() - 0.5) * noise),
-        y: clamp(Math.sin(angle) * radius + (Math.random() - 0.5) * noise),
-        label,
-      });
-    }
-    return pts;
+  function dropRow(board, col) {
+    for (let r = ROWS - 1; r >= 0; r--) if (board[r][col] === EMPTY) return r;
+    return -1;
   }
 
-  function generateSpiral(n = 220) {
-    const pts = [];
-    const perClass = n / 2;
-    for (let label = 0; label < 2; label++) {
-      for (let i = 0; i < perClass; i++) {
-        const t = (i / perClass) * 4;
-        const r = t * 0.28;
-        const angle = t * Math.PI * 2.2 + (label === 1 ? Math.PI : 0);
-        const noise = 0.03;
-        pts.push({
-          x: clamp(r * Math.cos(angle) + (Math.random() - 0.5) * noise),
-          y: clamp(r * Math.sin(angle) + (Math.random() - 0.5) * noise),
-          label,
-        });
+  function checkWinner(board, player) {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c <= COLS - 4; c++) {
+        if (board[r][c] === player && board[r][c + 1] === player && board[r][c + 2] === player && board[r][c + 3] === player) return true;
       }
     }
-    return pts;
+    for (let c = 0; c < COLS; c++) {
+      for (let r = 0; r <= ROWS - 4; r++) {
+        if (board[r][c] === player && board[r + 1][c] === player && board[r + 2][c] === player && board[r + 3][c] === player) return true;
+      }
+    }
+    for (let r = 0; r <= ROWS - 4; r++) {
+      for (let c = 0; c <= COLS - 4; c++) {
+        if (board[r][c] === player && board[r + 1][c + 1] === player && board[r + 2][c + 2] === player && board[r + 3][c + 3] === player) return true;
+      }
+    }
+    for (let r = 3; r < ROWS; r++) {
+      for (let c = 0; c <= COLS - 4; c++) {
+        if (board[r][c] === player && board[r - 1][c + 1] === player && board[r - 2][c + 2] === player && board[r - 3][c + 3] === player) return true;
+      }
+    }
+    return false;
   }
 
-  function generateDataset(name) {
-    if (name === 'circles') return generateCircles();
-    if (name === 'spiral') return generateSpiral();
-    return generateXOR();
+  function isBoardFull(board) {
+    return board[0].every((v) => v !== EMPTY);
   }
 
-  function hexToRgb(hex) {
-    const h = hex.trim().replace('#', '');
-    const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
-    const bigint = parseInt(full, 16);
-    return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+  function evaluateWindow(cells, aiPlayer, humanPlayer) {
+    const aiCount = cells.filter((v) => v === aiPlayer).length;
+    const humanCount = cells.filter((v) => v === humanPlayer).length;
+    const emptyCount = cells.filter((v) => v === EMPTY).length;
+    if (aiCount === 4) return 100000;
+    if (humanCount === 4) return -100000;
+    let score = 0;
+    if (aiCount === 3 && emptyCount === 1) score += 50;
+    else if (aiCount === 2 && emptyCount === 2) score += 10;
+    if (humanCount === 3 && emptyCount === 1) score -= 60;
+    else if (humanCount === 2 && emptyCount === 2) score -= 10;
+    return score;
   }
 
-  let net = createNetwork();
-  let points = generateDataset('xor');
-  let lr = parseFloat(lrSlider.value);
-  let training = false;
-  let animHandle = null;
-  let epoch = 0;
+  function evaluateBoard(board, aiPlayer) {
+    const humanPlayer = aiPlayer === PLAYER ? AI : PLAYER;
+    let score = 0;
 
-  function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const centerCol = Math.floor(COLS / 2);
+    for (let r = 0; r < ROWS; r++) if (board[r][centerCol] === aiPlayer) score += 6;
+
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c <= COLS - 4; c++) {
+        score += evaluateWindow([board[r][c], board[r][c + 1], board[r][c + 2], board[r][c + 3]], aiPlayer, humanPlayer);
+      }
+    }
+    for (let c = 0; c < COLS; c++) {
+      for (let r = 0; r <= ROWS - 4; r++) {
+        score += evaluateWindow([board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]], aiPlayer, humanPlayer);
+      }
+    }
+    for (let r = 0; r <= ROWS - 4; r++) {
+      for (let c = 0; c <= COLS - 4; c++) {
+        score += evaluateWindow([board[r][c], board[r + 1][c + 1], board[r + 2][c + 2], board[r + 3][c + 3]], aiPlayer, humanPlayer);
+      }
+    }
+    for (let r = 3; r < ROWS; r++) {
+      for (let c = 0; c <= COLS - 4; c++) {
+        score += evaluateWindow([board[r][c], board[r - 1][c + 1], board[r - 2][c + 2], board[r - 3][c + 3]], aiPlayer, humanPlayer);
+      }
+    }
+    return score;
+  }
+
+  // Minimax with alpha-beta pruning, center-first move ordering for better cutoffs.
+  function minimax(board, depth, alpha, beta, maximizing, aiPlayer, humanPlayer) {
+    const cols = validColumns(board).sort((a, b) => Math.abs(a - 3) - Math.abs(b - 3));
+    const aiWins = checkWinner(board, aiPlayer);
+    const humanWins = checkWinner(board, humanPlayer);
+
+    if (aiWins) return { score: 1000000 + depth, column: null };
+    if (humanWins) return { score: -1000000 - depth, column: null };
+    if (cols.length === 0) return { score: 0, column: null };
+    if (depth === 0) return { score: evaluateBoard(board, aiPlayer), column: null };
+
+    let bestCol = cols[0];
+    if (maximizing) {
+      let value = -Infinity;
+      for (const col of cols) {
+        const row = dropRow(board, col);
+        board[row][col] = aiPlayer;
+        const result = minimax(board, depth - 1, alpha, beta, false, aiPlayer, humanPlayer);
+        board[row][col] = EMPTY;
+        if (result.score > value) {
+          value = result.score;
+          bestCol = col;
+        }
+        alpha = Math.max(alpha, value);
+        if (alpha >= beta) break;
+      }
+      return { score: value, column: bestCol };
+    }
+
+    let value = Infinity;
+    for (const col of cols) {
+      const row = dropRow(board, col);
+      board[row][col] = humanPlayer;
+      const result = minimax(board, depth - 1, alpha, beta, true, aiPlayer, humanPlayer);
+      board[row][col] = EMPTY;
+      if (result.score < value) {
+        value = result.score;
+        bestCol = col;
+      }
+      beta = Math.min(beta, value);
+      if (alpha >= beta) break;
+    }
+    return { score: value, column: bestCol };
+  }
+
+  let board = createBoard();
+  let gameOver = false;
+  let playerTurn = true;
+  let depth = parseInt(difficultyDD.getValue(), 10);
+
+  const cells = [];
+  for (let i = 0; i < ROWS * COLS; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'c4-cell';
+    const disc = document.createElement('div');
+    disc.className = 'c4-disc';
+    cell.appendChild(disc);
+    const col = i % COLS;
+    cell.addEventListener('click', () => handleColumnClick(col));
+    boardEl.appendChild(cell);
+    cells.push(cell);
+  }
+
+  function render() {
+    cells.forEach((cell, i) => {
+      const r = Math.floor(i / COLS);
+      const c = i % COLS;
+      const val = board[r][c];
+      const disc = cell.querySelector('.c4-disc');
+      cell.classList.toggle('is-filled', val !== EMPTY);
+      disc.className = `c4-disc${val === PLAYER ? ' is-player' : val === AI ? ' is-ai' : ''}`;
+    });
+    boardEl.classList.toggle('is-over', gameOver);
+  }
+
+  function endGame(message) {
+    gameOver = true;
+    statusEl.textContent = message;
+  }
+
+  function aiMove() {
+    const { column } = minimax(board, depth, -Infinity, Infinity, true, AI, PLAYER);
+    const row = dropRow(board, column);
+    board[row][column] = AI;
+    render();
+    if (checkWinner(board, AI)) return endGame('The AI wins!');
+    if (isBoardFull(board)) return endGame("It's a draw!");
+    playerTurn = true;
+    statusEl.textContent = 'Your turn - click a column to drop a disc.';
+  }
+
+  function handleColumnClick(col) {
+    if (gameOver || !playerTurn) return;
+    const row = dropRow(board, col);
+    if (row === -1) return;
+    board[row][col] = PLAYER;
+    render();
+    if (checkWinner(board, PLAYER)) return endGame('You win!');
+    if (isBoardFull(board)) return endGame("It's a draw!");
+    playerTurn = false;
+    statusEl.textContent = 'AI is thinking...';
+    setTimeout(aiMove, 30);
+  }
+
+  resetBtn.addEventListener('click', () => {
+    board = createBoard();
+    gameOver = false;
+    playerTurn = true;
+    render();
+    statusEl.textContent = 'Your turn - click a column to drop a disc.';
+  });
+
+  difficultyDD.addEventListener('dd-change', (e) => {
+    depth = parseInt(e.detail.value, 10);
+  });
+
+  render();
+})();
+
+// Huffman coding compressor: a hand-written binary min-heap builds an optimal
+// prefix-code tree, encodes the text to real bits, then decodes those bits
+// back to prove the round trip is lossless - no compression library involved.
+(() => {
+  const inputEl = document.getElementById('hufInput');
+  if (!inputEl) return;
+  const compressBtn = document.getElementById('hufCompress');
+  const sampleBtn = document.getElementById('hufSample');
+  const statusEl = document.getElementById('hufStatus');
+  const bodyEl = document.getElementById('hufBody');
+  const statsEl = document.getElementById('hufStats');
+  const tableBodyEl = document.getElementById('hufTableBody');
+  const verifyEl = document.getElementById('hufVerify');
+  const canvas = document.getElementById('hufTreeCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const SAMPLE_TEXT = 'the quick brown fox jumps over the lazy dog';
+
+  class MinHeap {
+    constructor() {
+      this.items = [];
+    }
+    size() {
+      return this.items.length;
+    }
+    push(node) {
+      this.items.push(node);
+      let i = this.items.length - 1;
+      while (i > 0) {
+        const parent = (i - 1) >> 1;
+        if (this.items[parent].freq <= this.items[i].freq) break;
+        [this.items[parent], this.items[i]] = [this.items[i], this.items[parent]];
+        i = parent;
+      }
+    }
+    pop() {
+      const top = this.items[0];
+      const last = this.items.pop();
+      if (this.items.length) {
+        this.items[0] = last;
+        let i = 0;
+        const n = this.items.length;
+        for (;;) {
+          let smallest = i;
+          const l = 2 * i + 1;
+          const r = 2 * i + 2;
+          if (l < n && this.items[l].freq < this.items[smallest].freq) smallest = l;
+          if (r < n && this.items[r].freq < this.items[smallest].freq) smallest = r;
+          if (smallest === i) break;
+          [this.items[smallest], this.items[i]] = [this.items[i], this.items[smallest]];
+          i = smallest;
+        }
+      }
+      return top;
+    }
+  }
+
+  function buildHuffmanTree(freq) {
+    const heap = new MinHeap();
+    freq.forEach((f, ch) => heap.push({ char: ch, freq: f, left: null, right: null }));
+
+    if (heap.size() === 1) {
+      return { char: null, freq: heap.items[0].freq, left: heap.pop(), right: null };
+    }
+
+    while (heap.size() > 1) {
+      const a = heap.pop();
+      const b = heap.pop();
+      heap.push({ char: null, freq: a.freq + b.freq, left: a, right: b });
+    }
+    return heap.pop();
+  }
+
+  function buildCodes(node, prefix, codes) {
+    if (!node.left && !node.right) {
+      codes[node.char] = prefix || '0';
+      return;
+    }
+    if (node.left) buildCodes(node.left, `${prefix}0`, codes);
+    if (node.right) buildCodes(node.right, `${prefix}1`, codes);
+  }
+
+  function encode(text, codes) {
+    let bits = '';
+    for (const ch of text) bits += codes[ch];
+    return bits;
+  }
+
+  function decode(bits, root) {
+    if (!root.left && !root.right) return root.char.repeat(bits.length);
+    let result = '';
+    let node = root;
+    for (const bit of bits) {
+      node = bit === '0' ? node.left : node.right;
+      if (!node.left && !node.right) {
+        result += node.char;
+        node = root;
+      }
+    }
+    return result;
+  }
+
+  function displayChar(ch) {
+    if (ch === ' ') return '␣';
+    if (ch === '\n') return '\\n';
+    if (ch === '\t') return '\\t';
+    return ch;
+  }
+
+  // Assigns each node a normalized (x, y) position - leaves spread evenly
+  // left to right, internal nodes centered above their children.
+  function layoutTree(root) {
+    const positions = new Map();
+    const leaves = [];
+    (function collect(node) {
+      if (!node.left && !node.right) {
+        leaves.push(node);
+        return;
+      }
+      if (node.left) collect(node.left);
+      if (node.right) collect(node.right);
+    })(root);
+
+    const leafCount = leaves.length;
+    let leafIndex = 0;
+
+    function assign(node, depth) {
+      if (!node.left && !node.right) {
+        const x = leafCount <= 1 ? 0.5 : leafIndex / (leafCount - 1);
+        leafIndex++;
+        positions.set(node, { x, y: depth });
+        return x;
+      }
+      const xs = [];
+      if (node.left) xs.push(assign(node.left, depth + 1));
+      if (node.right) xs.push(assign(node.right, depth + 1));
+      const x = xs.reduce((a, b) => a + b, 0) / xs.length;
+      positions.set(node, { x, y: depth });
+      return x;
+    }
+    assign(root, 0);
+
+    let maxDepth = 0;
+    positions.forEach((p) => {
+      if (p.y > maxDepth) maxDepth = p.y;
+    });
+
+    return { positions, maxDepth };
+  }
+
+  function drawTree(root) {
     const rect = canvas.getBoundingClientRect();
     if (!rect.width) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    draw();
-  }
+    ctx.clearRect(0, 0, rect.width, rect.height);
 
-  function draw() {
-    const rect = canvas.getBoundingClientRect();
-    if (!rect.width) return;
-
+    const { positions, maxDepth } = layoutTree(root);
     const styles = getComputedStyle(document.documentElement);
-    const colorA = hexToRgb(styles.getPropertyValue('--accent'));
-    const colorB = hexToRgb(styles.getPropertyValue('--accent-2'));
-    const bgAlt = styles.getPropertyValue('--bg-alt').trim();
+    const accent = styles.getPropertyValue('--accent').trim();
+    const accent2 = styles.getPropertyValue('--accent-2').trim();
+    const textDim = styles.getPropertyValue('--text-dim').trim();
 
-    const GRID = 40;
-    const cellW = rect.width / GRID;
-    const cellH = rect.height / GRID;
-    for (let gy = 0; gy < GRID; gy++) {
-      const y = 1 - ((gy + 0.5) / GRID) * 2;
-      for (let gx = 0; gx < GRID; gx++) {
-        const x = ((gx + 0.5) / GRID) * 2 - 1;
-        const { yhat } = forward(net, x, y);
-        const r = Math.round(colorA.r + (colorB.r - colorA.r) * yhat);
-        const g = Math.round(colorA.g + (colorB.g - colorA.g) * yhat);
-        const b = Math.round(colorA.b + (colorB.b - colorA.b) * yhat);
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.55)`;
-        ctx.fillRect(gx * cellW, gy * cellH, cellW + 1, cellH + 1);
-      }
+    const padX = 26;
+    const padY = 22;
+    const usableW = rect.width - padX * 2;
+    const usableH = rect.height - padY * 2;
+    const rowH = maxDepth > 0 ? usableH / maxDepth : 0;
+
+    const toPixel = (pos) => ({ x: padX + pos.x * usableW, y: padY + pos.y * rowH });
+
+    function drawEdges(node) {
+      const pp = toPixel(positions.get(node));
+      ['left', 'right'].forEach((side) => {
+        const child = node[side];
+        if (!child) return;
+        const cp = toPixel(positions.get(child));
+        ctx.strokeStyle = textDim;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pp.x, pp.y);
+        ctx.lineTo(cp.x, cp.y);
+        ctx.stroke();
+        ctx.fillStyle = textDim;
+        ctx.font = '11px monospace';
+        ctx.fillText(side === 'left' ? '0' : '1', (pp.x + cp.x) / 2 + (side === 'left' ? -10 : 4), (pp.y + cp.y) / 2);
+        drawEdges(child);
+      });
     }
+    drawEdges(root);
 
-    points.forEach((p) => {
-      const px = ((p.x + 1) / 2) * rect.width;
-      const py = ((1 - p.y) / 2) * rect.height;
+    positions.forEach((pos, node) => {
+      const p = toPixel(pos);
+      const isLeaf = !node.left && !node.right;
       ctx.beginPath();
-      ctx.fillStyle = p.label === 0 ? styles.getPropertyValue('--accent') : styles.getPropertyValue('--accent-2');
-      ctx.strokeStyle = bgAlt;
-      ctx.lineWidth = 1.5;
-      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fillStyle = isLeaf ? accent2 : accent;
+      ctx.arc(p.x, p.y, isLeaf ? 12 : 6, 0, Math.PI * 2);
       ctx.fill();
-      ctx.stroke();
+      if (isLeaf) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 11px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(displayChar(node.char), p.x, p.y + 1);
+      }
     });
   }
 
-  function stepLoop() {
-    if (!training) return;
-    let loss = 0;
-    const stepsPerFrame = 6;
-    for (let i = 0; i < stepsPerFrame; i++) {
-      loss = trainStep(net, points, lr);
-      epoch++;
+  let lastTree = null;
+
+  function compress() {
+    const text = inputEl.value;
+    if (!text.length) {
+      statusEl.hidden = false;
+      statusEl.textContent = 'Enter some text and click Compress.';
+      bodyEl.hidden = true;
+      lastTree = null;
+      return;
     }
-    draw();
-    statusEl.textContent = `Epoch ${epoch} · loss ${loss.toFixed(4)}`;
-    animHandle = requestAnimationFrame(stepLoop);
+
+    const freq = new Map();
+    for (const ch of text) freq.set(ch, (freq.get(ch) || 0) + 1);
+
+    const root = buildHuffmanTree(freq);
+    const codes = {};
+    buildCodes(root, '', codes);
+    const bits = encode(text, codes);
+    const decoded = decode(bits, root);
+
+    statusEl.hidden = true;
+    bodyEl.hidden = false;
+
+    const originalBits = text.length * 8;
+    const compressedBits = bits.length;
+    const savedPct = ((1 - compressedBits / originalBits) * 100).toFixed(1);
+
+    statsEl.innerHTML = '';
+    [
+      ['Original size', `${originalBits.toLocaleString()} bits`, false],
+      ['Compressed size', `${compressedBits.toLocaleString()} bits`, false],
+      ['Space saved', `${savedPct}%`, true],
+    ].forEach(([label, value, isSavings]) => {
+      const tile = document.createElement('div');
+      tile.className = 'huf-stat';
+      const l = document.createElement('span');
+      l.className = 'huf-stat-label';
+      l.textContent = label;
+      const v = document.createElement('span');
+      v.className = `huf-stat-value${isSavings ? ' is-savings' : ''}`;
+      v.textContent = value;
+      tile.append(l, v);
+      statsEl.appendChild(tile);
+    });
+
+    tableBodyEl.innerHTML = '';
+    Object.entries(codes)
+      .sort((a, b) => freq.get(b[0]) - freq.get(a[0]))
+      .forEach(([ch, code]) => {
+        const row = document.createElement('tr');
+        const chCell = document.createElement('td');
+        chCell.textContent = displayChar(ch);
+        const freqCell = document.createElement('td');
+        freqCell.textContent = freq.get(ch);
+        const codeCell = document.createElement('td');
+        codeCell.textContent = code;
+        row.append(chCell, freqCell, codeCell);
+        tableBodyEl.appendChild(row);
+      });
+
+    const ok = decoded === text;
+    verifyEl.textContent = ok
+      ? 'Decoded it back and got your exact text. No data lost.'
+      : 'Something is off, the decoded text does not match.';
+    verifyEl.classList.toggle('is-ok', ok);
+
+    lastTree = root;
+    drawTree(root);
   }
 
-  trainBtn.addEventListener('click', () => {
-    training = !training;
-    trainBtn.textContent = training ? 'Pause' : 'Train';
-    if (training) stepLoop();
-    else cancelAnimationFrame(animHandle);
+  compressBtn.addEventListener('click', compress);
+  sampleBtn.addEventListener('click', () => {
+    inputEl.value = SAMPLE_TEXT;
+    compress();
   });
 
-  resetBtn.addEventListener('click', () => {
-    training = false;
-    trainBtn.textContent = 'Train';
-    cancelAnimationFrame(animHandle);
-    epoch = 0;
-    net = createNetwork();
-    draw();
-    statusEl.textContent = 'Click Train to start learning.';
+  window.addEventListener('resize', () => {
+    if (lastTree) drawTree(lastTree);
   });
 
-  datasetSelect.addEventListener('change', () => {
-    training = false;
-    trainBtn.textContent = 'Train';
-    cancelAnimationFrame(animHandle);
-    epoch = 0;
-    points = generateDataset(datasetSelect.value);
-    net = createNetwork();
-    draw();
-    statusEl.textContent = 'Click Train to start learning.';
+  // The canvas is inside a hidden tab panel at load time (display: none),
+  // so it has zero size until the tab is actually opened - redraw then.
+  document.getElementById('tabHuffman')?.addEventListener('click', () => {
+    if (lastTree) drawTree(lastTree);
   });
 
-  lrSlider.addEventListener('input', () => {
-    lr = parseFloat(lrSlider.value);
-  });
-
-  window.addEventListener('resize', resizeCanvas);
-
-  // The canvas starts at 0x0 while its tab is hidden (display: none), so size
-  // it for real the first time the tab is actually switched to.
-  let hasSized = false;
-  document.getElementById('tabNN')?.addEventListener('click', () => {
-    if (hasSized) return;
-    hasSized = true;
-    resizeCanvas();
-  });
+  compress();
 })();
 
 // Lazily load the decorative three.js background after the page has settled,
