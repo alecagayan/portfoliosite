@@ -152,11 +152,17 @@
       <div class="container">
         <h2 class="section-title"><span>06.</span> Playground</h2>
         <p class="playground-intro">
-          A small demo built from scratch: the skin lesion classifier from my
-          <a href="#projects">Skin Cancer Detection project</a>, running entirely in your browser.
+          Two small demos built from scratch: the skin lesion classifier from my
+          <a href="#projects">Skin Cancer Detection project</a>, and a neural network that trains
+          live in your browser - both running entirely client-side.
         </p>
 
-        <div id="panelSkin">
+        <div class="playground-tabs" role="tablist">
+          <button type="button" class="playground-tab is-active" id="tabSkin" data-panel="panelSkin" role="tab" aria-selected="true">Skin Lesion Classifier</button>
+          <button type="button" class="playground-tab" id="tabNN" data-panel="panelNN" role="tab" aria-selected="false">Neural Network Playground</button>
+        </div>
+
+        <div class="playground-panel is-active" id="panelSkin" role="tabpanel">
           <p class="playground-desc">
             A convolutional neural network trained on the <strong>HAM10000</strong> dermatoscopic
             image dataset (7 lesion classes), running as a TensorFlow.js model directly in your
@@ -234,6 +240,35 @@
             </div>
           </div>
           <p class="skin-disclaimer">For demonstration only - not a medical device, and not a substitute for a dermatologist.</p>
+        </div>
+
+        <div class="playground-panel" id="panelNN" role="tabpanel">
+          <p class="playground-desc">
+            A tiny neural network (2 &rarr; 8 &rarr; 8 &rarr; 1) with forward and backward passes
+            written by hand in plain JavaScript - no TensorFlow here. Pick a dataset and watch it
+            learn the decision boundary live, via real gradient descent.
+          </p>
+          <div class="nn-controls">
+            <select id="nnDataset" aria-label="Dataset">
+              <option value="xor">XOR</option>
+              <option value="circles">Circles</option>
+              <option value="spiral">Spiral</option>
+            </select>
+            <button type="button" id="nnTrain" class="btn btn-primary btn-small">Train</button>
+            <button type="button" id="nnReset" class="btn btn-secondary btn-small">Reset</button>
+            <label class="nn-lr-label">
+              Learning rate
+              <input type="range" id="nnLr" min="0.05" max="2" step="0.05" value="0.8" />
+            </label>
+          </div>
+          <div class="nn-demo">
+            <canvas id="nnCanvas" class="nn-canvas" aria-label="Decision boundary visualization"></canvas>
+            <div class="nn-legend">
+              <span><i class="nn-dot nn-dot-a"></i> Class A</span>
+              <span><i class="nn-dot nn-dot-b"></i> Class B</span>
+            </div>
+          </div>
+          <p class="nn-status" id="nnStatus">Click Train to start learning.</p>
         </div>
       </div>
     </section>

@@ -746,6 +746,23 @@ Promise.all([
     projectsGrid.innerHTML = '<p>Could not load projects right now.</p>';
   });
 
+// Playground tabs
+const playgroundTabs = document.querySelectorAll('.playground-tab');
+playgroundTabs.forEach((tab) => {
+  tab.addEventListener('click', () => {
+    playgroundTabs.forEach((t) => {
+      t.classList.remove('is-active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    tab.classList.add('is-active');
+    tab.setAttribute('aria-selected', 'true');
+
+    document.querySelectorAll('.playground-panel').forEach((panel) => {
+      panel.classList.toggle('is-active', panel.id === tab.dataset.panel);
+    });
+  });
+});
+
 // Skin lesion classifier: the real TensorFlow.js model from the Skin Cancer
 // Detection project (a CNN trained on HAM10000 dermatoscopic images), run as
 // client-side inference. tf.js is lazy-loaded from a CDN the first time it's
@@ -1020,6 +1037,291 @@ Promise.all([
     );
     initObserver.observe(playgroundSection);
   }
+})();
+
+// Neural network playground: a tiny 2-8-8-1 MLP with forward and backward
+// passes written by hand (no TensorFlow) that trains live in the browser via
+// full-batch gradient descent, rendering its decision boundary as it learns.
+(() => {
+  const canvas = document.getElementById('nnCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const datasetSelect = document.getElementById('nnDataset');
+  const trainBtn = document.getElementById('nnTrain');
+  const resetBtn = document.getElementById('nnReset');
+  const lrSlider = document.getElementById('nnLr');
+  const statusEl = document.getElementById('nnStatus');
+
+  const ARCH = { in: 2, h1: 8, h2: 8, out: 1 };
+
+  function clamp(v) {
+    return Math.max(-1, Math.min(1, v));
+  }
+
+  function makeMatrix(rows, cols, fn) {
+    return Array.from({ length: rows }, () => Array.from({ length: cols }, fn));
+  }
+
+  function createNetwork() {
+    const initFor = (fanIn) => () => (Math.random() * 2 - 1) * Math.sqrt(1 / fanIn);
+    return {
+      W1: makeMatrix(ARCH.in, ARCH.h1, initFor(ARCH.in)),
+      b1: Array(ARCH.h1).fill(0),
+      W2: makeMatrix(ARCH.h1, ARCH.h2, initFor(ARCH.h1)),
+      b2: Array(ARCH.h2).fill(0),
+      W3: makeMatrix(ARCH.h2, ARCH.out, initFor(ARCH.h2)),
+      b3: Array(ARCH.out).fill(0),
+    };
+  }
+
+  function sigmoid(x) {
+    return 1 / (1 + Math.exp(-x));
+  }
+
+  // Forward pass for a single (x, y) point - tanh hidden layers, sigmoid output.
+  function forward(net, x0, x1) {
+    const a1 = new Array(ARCH.h1);
+    for (let j = 0; j < ARCH.h1; j++) {
+      a1[j] = Math.tanh(x0 * net.W1[0][j] + x1 * net.W1[1][j] + net.b1[j]);
+    }
+    const a2 = new Array(ARCH.h2);
+    for (let k = 0; k < ARCH.h2; k++) {
+      let sum = net.b2[k];
+      for (let j = 0; j < ARCH.h1; j++) sum += a1[j] * net.W2[j][k];
+      a2[k] = Math.tanh(sum);
+    }
+    let z3 = net.b3[0];
+    for (let k = 0; k < ARCH.h2; k++) z3 += a2[k] * net.W3[k][0];
+    return { a1, a2, yhat: sigmoid(z3) };
+  }
+
+  // One full-batch gradient-descent step (backprop by hand) over all points.
+  function trainStep(net, points, lr) {
+    const gW1 = makeMatrix(ARCH.in, ARCH.h1, () => 0);
+    const gb1 = Array(ARCH.h1).fill(0);
+    const gW2 = makeMatrix(ARCH.h1, ARCH.h2, () => 0);
+    const gb2 = Array(ARCH.h2).fill(0);
+    const gW3 = makeMatrix(ARCH.h2, ARCH.out, () => 0);
+    const gb3 = Array(ARCH.out).fill(0);
+
+    let totalLoss = 0;
+    const eps = 1e-9;
+
+    points.forEach((p) => {
+      const { a1, a2, yhat } = forward(net, p.x, p.y);
+      const y = p.label;
+      totalLoss += -(y * Math.log(yhat + eps) + (1 - y) * Math.log(1 - yhat + eps));
+
+      const dz3 = yhat - y;
+      for (let k = 0; k < ARCH.h2; k++) gW3[k][0] += a2[k] * dz3;
+      gb3[0] += dz3;
+
+      const dz2 = new Array(ARCH.h2);
+      for (let k = 0; k < ARCH.h2; k++) {
+        const da2 = dz3 * net.W3[k][0];
+        dz2[k] = da2 * (1 - a2[k] * a2[k]);
+      }
+      for (let j = 0; j < ARCH.h1; j++) {
+        for (let k = 0; k < ARCH.h2; k++) gW2[j][k] += a1[j] * dz2[k];
+      }
+      for (let k = 0; k < ARCH.h2; k++) gb2[k] += dz2[k];
+
+      const dz1 = new Array(ARCH.h1);
+      for (let j = 0; j < ARCH.h1; j++) {
+        let da1 = 0;
+        for (let k = 0; k < ARCH.h2; k++) da1 += dz2[k] * net.W2[j][k];
+        dz1[j] = da1 * (1 - a1[j] * a1[j]);
+      }
+      for (let j = 0; j < ARCH.h1; j++) {
+        gW1[0][j] += p.x * dz1[j];
+        gW1[1][j] += p.y * dz1[j];
+        gb1[j] += dz1[j];
+      }
+    });
+
+    const n = points.length;
+    for (let i = 0; i < ARCH.in; i++)
+      for (let j = 0; j < ARCH.h1; j++) net.W1[i][j] -= (lr * gW1[i][j]) / n;
+    for (let j = 0; j < ARCH.h1; j++) net.b1[j] -= (lr * gb1[j]) / n;
+    for (let j = 0; j < ARCH.h1; j++)
+      for (let k = 0; k < ARCH.h2; k++) net.W2[j][k] -= (lr * gW2[j][k]) / n;
+    for (let k = 0; k < ARCH.h2; k++) net.b2[k] -= (lr * gb2[k]) / n;
+    for (let k = 0; k < ARCH.h2; k++) net.W3[k][0] -= (lr * gW3[k][0]) / n;
+    net.b3[0] -= (lr * gb3[0]) / n;
+
+    return totalLoss / n;
+  }
+
+  // Synthetic 2D datasets, generated in [-1, 1] x [-1, 1].
+  function generateXOR(n = 220) {
+    const pts = [];
+    while (pts.length < n) {
+      const x = Math.random() * 2 - 1;
+      const y = Math.random() * 2 - 1;
+      if (Math.abs(x) < 0.1 || Math.abs(y) < 0.1) continue;
+      pts.push({ x, y, label: (x > 0) === (y > 0) ? 0 : 1 });
+    }
+    return pts;
+  }
+
+  function generateCircles(n = 220) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const label = i % 2;
+      const angle = Math.random() * Math.PI * 2;
+      const radius = label === 0 ? Math.random() * 0.35 : 0.65 + Math.random() * 0.3;
+      const noise = 0.04;
+      pts.push({
+        x: clamp(Math.cos(angle) * radius + (Math.random() - 0.5) * noise),
+        y: clamp(Math.sin(angle) * radius + (Math.random() - 0.5) * noise),
+        label,
+      });
+    }
+    return pts;
+  }
+
+  function generateSpiral(n = 220) {
+    const pts = [];
+    const perClass = n / 2;
+    for (let label = 0; label < 2; label++) {
+      for (let i = 0; i < perClass; i++) {
+        const t = (i / perClass) * 4;
+        const r = t * 0.28;
+        const angle = t * Math.PI * 2.2 + (label === 1 ? Math.PI : 0);
+        const noise = 0.03;
+        pts.push({
+          x: clamp(r * Math.cos(angle) + (Math.random() - 0.5) * noise),
+          y: clamp(r * Math.sin(angle) + (Math.random() - 0.5) * noise),
+          label,
+        });
+      }
+    }
+    return pts;
+  }
+
+  function generateDataset(name) {
+    if (name === 'circles') return generateCircles();
+    if (name === 'spiral') return generateSpiral();
+    return generateXOR();
+  }
+
+  function hexToRgb(hex) {
+    const h = hex.trim().replace('#', '');
+    const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
+    const bigint = parseInt(full, 16);
+    return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+  }
+
+  let net = createNetwork();
+  let points = generateDataset('xor');
+  let lr = parseFloat(lrSlider.value);
+  let training = false;
+  let animHandle = null;
+  let epoch = 0;
+
+  function resizeCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width) return;
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function draw() {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width) return;
+
+    const styles = getComputedStyle(document.documentElement);
+    const colorA = hexToRgb(styles.getPropertyValue('--accent'));
+    const colorB = hexToRgb(styles.getPropertyValue('--accent-2'));
+    const bgAlt = styles.getPropertyValue('--bg-alt').trim();
+
+    const GRID = 40;
+    const cellW = rect.width / GRID;
+    const cellH = rect.height / GRID;
+    for (let gy = 0; gy < GRID; gy++) {
+      const y = 1 - ((gy + 0.5) / GRID) * 2;
+      for (let gx = 0; gx < GRID; gx++) {
+        const x = ((gx + 0.5) / GRID) * 2 - 1;
+        const { yhat } = forward(net, x, y);
+        const r = Math.round(colorA.r + (colorB.r - colorA.r) * yhat);
+        const g = Math.round(colorA.g + (colorB.g - colorA.g) * yhat);
+        const b = Math.round(colorA.b + (colorB.b - colorA.b) * yhat);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.55)`;
+        ctx.fillRect(gx * cellW, gy * cellH, cellW + 1, cellH + 1);
+      }
+    }
+
+    points.forEach((p) => {
+      const px = ((p.x + 1) / 2) * rect.width;
+      const py = ((1 - p.y) / 2) * rect.height;
+      ctx.beginPath();
+      ctx.fillStyle = p.label === 0 ? styles.getPropertyValue('--accent') : styles.getPropertyValue('--accent-2');
+      ctx.strokeStyle = bgAlt;
+      ctx.lineWidth = 1.5;
+      ctx.arc(px, py, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+  }
+
+  function stepLoop() {
+    if (!training) return;
+    let loss = 0;
+    const stepsPerFrame = 6;
+    for (let i = 0; i < stepsPerFrame; i++) {
+      loss = trainStep(net, points, lr);
+      epoch++;
+    }
+    draw();
+    statusEl.textContent = `Epoch ${epoch} · loss ${loss.toFixed(4)}`;
+    animHandle = requestAnimationFrame(stepLoop);
+  }
+
+  trainBtn.addEventListener('click', () => {
+    training = !training;
+    trainBtn.textContent = training ? 'Pause' : 'Train';
+    if (training) stepLoop();
+    else cancelAnimationFrame(animHandle);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    training = false;
+    trainBtn.textContent = 'Train';
+    cancelAnimationFrame(animHandle);
+    epoch = 0;
+    net = createNetwork();
+    draw();
+    statusEl.textContent = 'Click Train to start learning.';
+  });
+
+  datasetSelect.addEventListener('change', () => {
+    training = false;
+    trainBtn.textContent = 'Train';
+    cancelAnimationFrame(animHandle);
+    epoch = 0;
+    points = generateDataset(datasetSelect.value);
+    net = createNetwork();
+    draw();
+    statusEl.textContent = 'Click Train to start learning.';
+  });
+
+  lrSlider.addEventListener('input', () => {
+    lr = parseFloat(lrSlider.value);
+  });
+
+  window.addEventListener('resize', resizeCanvas);
+
+  // The canvas starts at 0x0 while its tab is hidden (display: none), so size
+  // it for real the first time the tab is actually switched to.
+  let hasSized = false;
+  document.getElementById('tabNN')?.addEventListener('click', () => {
+    if (hasSized) return;
+    hasSized = true;
+    resizeCanvas();
+  });
 })();
 
 // Lazily load the decorative three.js background after the page has settled,
