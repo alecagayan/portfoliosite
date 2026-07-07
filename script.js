@@ -746,8 +746,60 @@ Promise.all([
     projectsGrid.innerHTML = '<p>Could not load projects right now.</p>';
   });
 
-// Playground tabs
+// Playground tabs - the outgoing panel fades/slides out first, then the
+// incoming one fades/slides in, instead of an instant display swap.
 const playgroundTabs = document.querySelectorAll('.playground-tab');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+// The panel marked is-active in the static HTML never goes through
+// showPlaygroundPanel(), so it needs its visible state set up front.
+document.querySelector('.playground-panel.is-active')?.classList.add('is-visible');
+
+function showPlaygroundPanel(panel) {
+  panel.classList.add('is-active');
+  void panel.offsetWidth; // force a reflow so display:block is committed before animating
+  // Lets a panel react once it's actually visible (e.g. sizing a canvas that
+  // was 0x0 while display: none), rather than reacting to the tab click itself.
+  panel.dispatchEvent(new CustomEvent('pg-shown'));
+  if (reducedMotion.matches) {
+    panel.classList.add('is-visible');
+  } else {
+    requestAnimationFrame(() => panel.classList.add('is-visible'));
+  }
+}
+
+function switchPlaygroundPanel(targetId) {
+  const current = document.querySelector('.playground-panel.is-active');
+  const next = document.getElementById(targetId);
+  if (!next || current === next) return;
+
+  if (!current || reducedMotion.matches) {
+    if (current) {
+      current.classList.remove('is-active', 'is-visible');
+    }
+    showPlaygroundPanel(next);
+    return;
+  }
+
+  current.classList.remove('is-visible');
+  const finish = (e) => {
+    if (e && (e.target !== current || e.propertyName !== 'opacity')) return;
+    current.removeEventListener('transitionend', finish);
+    current.classList.remove('is-active');
+    showPlaygroundPanel(next);
+  };
+  current.addEventListener('transitionend', finish);
+  setTimeout(finish, 320);
+}
+
+const playgroundTabIndicator = document.getElementById('playgroundTabIndicator');
+
+function movePlaygroundIndicator(tab) {
+  if (!playgroundTabIndicator || !tab) return;
+  playgroundTabIndicator.style.width = `${tab.offsetWidth}px`;
+  playgroundTabIndicator.style.transform = `translateX(${tab.offsetLeft}px)`;
+}
+
 playgroundTabs.forEach((tab) => {
   tab.addEventListener('click', () => {
     playgroundTabs.forEach((t) => {
@@ -757,10 +809,14 @@ playgroundTabs.forEach((tab) => {
     tab.classList.add('is-active');
     tab.setAttribute('aria-selected', 'true');
 
-    document.querySelectorAll('.playground-panel').forEach((panel) => {
-      panel.classList.toggle('is-active', panel.id === tab.dataset.panel);
-    });
+    movePlaygroundIndicator(tab);
+    switchPlaygroundPanel(tab.dataset.panel);
   });
+});
+
+movePlaygroundIndicator(document.querySelector('.playground-tab.is-active'));
+window.addEventListener('resize', () => {
+  movePlaygroundIndicator(document.querySelector('.playground-tab.is-active'));
 });
 
 // Skin lesion classifier: the real TensorFlow.js model from the Skin Cancer
@@ -1626,8 +1682,8 @@ playgroundTabs.forEach((tab) => {
   });
 
   // The canvas is inside a hidden tab panel at load time (display: none),
-  // so it has zero size until the tab is actually opened - redraw then.
-  document.getElementById('tabHuffman')?.addEventListener('click', () => {
+  // so it has zero size until the panel actually becomes visible - redraw then.
+  document.getElementById('panelHuffman')?.addEventListener('pg-shown', () => {
     if (lastTree) drawTree(lastTree);
   });
 
