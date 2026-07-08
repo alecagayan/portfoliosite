@@ -1993,13 +1993,17 @@ initDropdown('frPresetDD', 'frPresetTrigger', 'frPresetLabel', 'frPresetMenu');
   if (panelEl?.classList.contains('is-active')) startDrift();
 })();
 
-// Lazily load the decorative WebGL shader background after the page has
-// settled. It's hand-rolled (no three.js, no CDN dependency), so this is
-// just deferring a small local file rather than a ~600KB library.
+// Lazily load the decorative three.js background after the page has settled,
+// so the initial load isn't blocked by a ~600KB library that's purely cosmetic.
 function loadBackgroundScene() {
-  const script = document.createElement('script');
-  script.src = 'shader-bg.js';
-  document.body.appendChild(script);
+  const threeScript = document.createElement('script');
+  threeScript.src = 'https://unpkg.com/three@0.160.0/build/three.min.js';
+  threeScript.onload = () => {
+    const sceneScript = document.createElement('script');
+    sceneScript.src = 'three-scene.js';
+    document.body.appendChild(sceneScript);
+  };
+  document.body.appendChild(threeScript);
 }
 
 window.addEventListener('load', () => {
