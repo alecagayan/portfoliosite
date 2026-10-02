@@ -1,46 +1,57 @@
 [
   {
-    "title": "This Portfolio Site",
-    "description": "A responsive personal portfolio built from scratch with vanilla HTML, CSS, and JavaScript, including a dark mode toggle and a few scroll-based animations.",
-    "details": "Built entirely with vanilla HTML, CSS, and JavaScript, no framework, no build step. Features a dark/light theme toggle with a circular reveal transition, scroll-triggered reveal animations, a subtle 3D tilt effect on project cards, and skill tags that automatically link to the projects that use them. Skills, certifications, and projects are all data-driven from JSON files so the content is easy to keep up to date.",
-    "icon": "📁",
-    "tags": ["HTML", "CSS", "JavaScript"],
+    "title": "Skin Cancer Detection Model",
+    "year": "2020",
+    "kind": "Machine learning",
+    "cover": "neural",
+    "description": "A convolutional neural network trained on 10,000+ dermoscopic images across 7 classes of skin lesions, reaching 89% classification accuracy. You can run it yourself in the Lab.",
+    "details": "Trained a convolutional neural network on a dataset of 10,000+ dermoscopic images spanning 7 classes of skin lesions. Used NumPy and Pandas for preprocessing and Keras/TensorFlow for model training, iterating on architecture and hyperparameters to reach 89% classification accuracy on the held-out test set. The trained model was later converted to TensorFlow.js so it runs client-side in the Lab section of this site.",
+    "highlights": ["89% accuracy on held-out test set", "10,000+ images · 7 lesion classes", "Runs live in the browser via TensorFlow.js"],
+    "tags": ["Python", "Keras", "TensorFlow", "NumPy", "Pandas"],
     "links": [
-      { "label": "GitHub", "url": "https://github.com/alecagayan/portfoliosite", "ariaLabel": "View source code on GitHub" },
-      { "label": "Live", "url": "#", "ariaLabel": "View live demo" }
+      { "label": "Try it in the Lab", "url": "#lab", "lab": "skin" },
+      { "label": "GitHub", "url": "https://github.com/alecagayan/skin-cancer" }
     ]
   },
   {
     "title": "Charity Donation App",
-    "description": "An iOS donation app with a SwiftUI profile screen built from reusable components, backed by AWS Lambda and EC2 for file storage and backend logic. Built in Xcode using modern Swift practices.",
+    "year": "2025",
+    "kind": "iOS · Cloud",
+    "cover": "orbits",
+    "description": "An iOS donation app with a SwiftUI profile experience built from reusable components, backed by AWS Lambda and EC2 for backend logic and file storage.",
     "details": "Designed and built a responsive SwiftUI user profile interface using reusable, composable views. Backed the app with AWS Lambda functions and EC2 for backend logic, with S3-backed storage for user file uploads. Built in Xcode following modern Swift and SwiftUI conventions in an agile, iterative workflow, with an emphasis on clean state management and reusable UI components.",
-    "icon": "📁",
-    "tags": ["Swift", "AWS Lambda", "EC2"],
+    "highlights": ["Composable SwiftUI view library", "Serverless backend on AWS Lambda", "S3-backed user uploads"],
+    "tags": ["Swift", "SwiftUI", "AWS Lambda", "AWS EC2", "AWS S3"],
     "links": [
-      { "label": "GitHub", "url": "https://github.com/spcoughlin/Giveo", "ariaLabel": "View source code on GitHub" }
+      { "label": "GitHub", "url": "https://github.com/spcoughlin/Giveo" }
     ]
   },
   {
     "title": "Attendance Tracker",
-    "description": "An attendance system with a Java REST API behind a React front-end, plus a companion iOS app in Swift that uses barcode scanning and biometric login to check students in.",
+    "year": "2022",
+    "kind": "Full-stack · iOS",
+    "cover": "barcode",
+    "description": "An attendance system with a Java REST API behind a React dashboard, plus a companion iOS app that checks students in with barcode scanning and Face ID.",
     "details": "Hosted a Java REST API server behind a React front-end for managing class attendance records. Built a companion iOS app in Swift with barcode scanning for fast check-ins and biometric login (Face ID) to prevent buddy-punching. Attendance data is stored in MySQL and served through the same API consumed by both the web dashboard and the iOS app.",
-    "icon": "📁",
-    "tags": ["React", "Java", "MySQL", "Swift"],
+    "highlights": ["One API serving web + iOS clients", "Barcode scanning for fast check-ins", "Face ID login to stop buddy-punching"],
+    "tags": ["React", "Java", "MySQL", "Swift", "REST APIs"],
     "links": [
-      { "label": "Frontend", "url": "https://github.com/alecagayan/checkpoint-client", "ariaLabel": "View frontend source code on GitHub" },
-      { "label": "Backend", "url": "https://github.com/alecagayan/checkpoint-server", "ariaLabel": "View backend source code on GitHub" },
-      { "label": "Live", "url": "https://mycheckpoint.org", "ariaLabel": "View live demo" }
+      { "label": "Live site", "url": "https://mycheckpoint.org" },
+      { "label": "Frontend", "url": "https://github.com/alecagayan/checkpoint-client" },
+      { "label": "Backend", "url": "https://github.com/alecagayan/checkpoint-server" }
     ]
   },
   {
-    "title": "Skin Cancer Detection Model",
-    "description": "A convolutional neural network trained on 10,000+ images across 7 classes of skin lesions, reaching 89% classification accuracy after tuning the model.",
-    "details": "Trained a convolutional neural network on a dataset of 10,000+ dermoscopic images spanning 7 classes of skin lesions. Used NumPy and Pandas for preprocessing and Keras/TensorFlow for model training, iterating on architecture and hyperparameters to reach 89% classification accuracy on the held-out test set.",
-    "icon": "📁",
-    "tags": ["Python", "Keras", "NumPy", "Pandas"],
+    "title": "This Portfolio",
+    "year": "2026",
+    "kind": "Web",
+    "cover": "grid",
+    "description": "The site you're on: hand-built with vanilla HTML, CSS, and ES modules. It has no framework and no build step, and every demo in the Lab is written from scratch.",
+    "details": "Built with plain HTML, CSS, and native ES modules, with no framework and no bundler. Content is driven by JSON files so it's easy to keep current. The hero is a dependency-free canvas particle field (it replaced a 600KB three.js scene), the command menu indexes every section, project, and lab experiment, and the Lab hosts a TensorFlow.js classifier, a minimax Connect Four engine, a Huffman compressor, and a WebGL fractal renderer. Light/dark themes, reduced-motion support, and full keyboard navigation throughout.",
+    "highlights": ["No framework, no bundler, no build step", "Four from-scratch interactive demos", "Keyboard-first: ⌘K reaches everything"],
+    "tags": ["JavaScript", "HTML & CSS", "WebGL"],
     "links": [
-      { "label": "GitHub", "url": "https://github.com/alecagayan/skin-cancer", "ariaLabel": "View source code on GitHub" },
-      { "label": "Live Demo", "url": "#playground", "ariaLabel": "Try the live demo in the Playground section" }
+      { "label": "GitHub", "url": "https://github.com/alecagayan/portfoliosite" }
     ]
   }
 ]
