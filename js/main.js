@@ -18,15 +18,17 @@ $('#themeToggle').addEventListener('click', () => {
 $('#year').textContent = new Date().getFullYear();
 
 /* Content, loaded from data/*.json so it's easy to edit */
+const tagList = (items) => el('ul', { class: 'tags' }, items.map((t) => el('li', { text: t })));
+
 function renderProjects(projects) {
   $('#projectList').replaceChildren(
     ...projects.map((p) =>
       el(
         'li',
-        {},
-        el('div', { class: 'project-head' }, el('h3', { text: p.title }), el('span', { class: 'project-meta', text: p.year })),
-        el('p', { text: p.description }),
-        el('p', { class: 'project-meta', text: p.tags.join(', ') }),
+        { class: 'card project' },
+        el('div', { class: 'project-head' }, el('h3', { text: p.title }), el('span', { class: 'meta', text: p.year })),
+        el('p', { class: 'project-desc', text: p.description }),
+        tagList(p.tags),
         el(
           'div',
           { class: 'project-links' },
@@ -34,7 +36,7 @@ function renderProjects(projects) {
             const internal = link.url.startsWith('#');
             return el('a', {
               href: link.url,
-              text: link.label,
+              text: internal ? `${link.label} ↓` : `${link.label} ↗`,
               target: internal ? null : '_blank',
               rel: internal ? null : 'noopener',
             });
@@ -51,20 +53,27 @@ function renderExperience(jobs) {
       el(
         'li',
         { class: 'entry' },
-        el('div', { class: 'entry-head' }, el('strong', { text: job.role }), el('span', { class: 'muted', text: job.dates.replace(' - ', ' – ') })),
-        el('p', { class: 'entry-sub', text: `${job.company}, ${job.location}` }),
-        el('ul', {}, job.bullets.map((b) => el('li', { text: b })))
+        el('p', { class: 'entry-dates meta', text: job.dates.replace(' - ', ' – ') }),
+        el(
+          'div',
+          {},
+          el('h3', { class: 'entry-title', text: job.role }),
+          el('p', { class: 'entry-sub', text: `${job.company} · ${job.location}` }),
+          el('ul', { class: 'entry-bullets' }, job.bullets.map((b) => el('li', { text: b })))
+        )
       )
     )
   );
 }
 
 function renderCerts(certs) {
-  $('#certList').replaceChildren(...certs.map((c) => el('li', {}, c.name, el('span', { class: 'muted', text: ` (${c.issuer}, ${c.date})` }))));
+  $('#certList').replaceChildren(
+    ...certs.map((c) => el('li', {}, el('span', { text: c.name }), el('span', { class: 'meta', text: `${c.issuer} · ${c.date}` })))
+  );
 }
 
 function renderSkills(groups) {
-  $('#skillList').replaceChildren(...groups.flatMap(({ category, skills }) => [el('dt', { text: category }), el('dd', { text: skills.join(', ') })]));
+  $('#skillList').replaceChildren(...groups.flatMap(({ category, skills }) => [el('dt', { text: category }), el('dd', {}, tagList(skills))]));
 }
 
 const getJSON = (path) =>

@@ -20,13 +20,16 @@
       if (saved) document.documentElement.setAttribute('data-theme', saved);
     })();
   </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" />
   <link rel="stylesheet" href="css/site.css" />
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
   <header class="site-header">
     <div class="container header-inner">
-      <a href="#top" class="name">Alec Agayan</a>
+      <a href="#top" class="name"><span class="name-mark" aria-hidden="true">AA</span>Alec Agayan</a>
       <nav aria-label="Primary">
         <a href="#projects">Projects</a>
         <a href="#demo">Demo</a>
@@ -43,17 +46,17 @@
     <section class="intro">
       <img class="avatar" src="assets/img/avatar.jpg" width="120" height="120" alt="Alec Agayan" />
       <div>
+        <p class="eyebrow">Software engineer · Northern Virginia</p>
         <h1>Alec Agayan</h1>
-        <p class="lead">Software engineer based in Northern Virginia.</p>
+        <p class="lead">I build iOS apps, web apps, and machine learning models.</p>
       </div>
     </section>
 
     <section class="bio">
       <p>
         I graduated from the University of Maryland in May 2026 with a B.S. in Computer Science,
-        concentrating in machine learning, and a minor in Business. I build iOS apps, full-stack
-        web apps, and machine learning models, and I hold the AWS Solutions Architect
-        Associate and Machine Learning Specialty certifications.
+        concentrating in machine learning, and a minor in Business. I also hold the AWS Solutions
+        Architect Associate and Machine Learning Specialty certifications.
       </p>
       <p>
         I work as a Tier 1 NOC Engineer at Visionary Solutions, where I monitor and troubleshoot a
@@ -61,10 +64,10 @@
         taught Python and Java at Fairfax Collegiate.
       </p>
       <p class="links">
-        <a href="mailto:alecagayan24@gmail.com">Email</a>
-        <a href="https://github.com/alecagayan" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://linkedin.com/in/alecagayan" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="assets/Agayan_Alec_Resume.pdf">Résumé (PDF)</a>
+        <a class="btn btn-primary" href="mailto:alecagayan24@gmail.com">Email me</a>
+        <a class="btn" href="assets/Agayan_Alec_Resume.pdf">Résumé</a>
+        <a class="btn" href="https://github.com/alecagayan" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://linkedin.com/in/alecagayan" target="_blank" rel="noopener">LinkedIn</a>
       </p>
     </section>
 
@@ -75,7 +78,7 @@
 
     <section id="demo">
       <h2>Live demo: skin lesion classifier</h2>
-      <div id="panel-skin">
+      <div id="panel-skin" class="card">
         <p>
           The CNN from my skin cancer detection project, trained on the HAM10000 dataset to sort
           dermatoscopic images into seven lesion types, running in the browser with TensorFlow.js.
@@ -116,15 +119,16 @@
       <h2>Education</h2>
       <ul class="entry-list">
         <li class="entry">
-          <div class="entry-head">
-            <strong>University of Maryland, College Park</strong>
-            <span class="muted">May 2026</span>
+          <p class="entry-dates meta">May 2026</p>
+          <div>
+            <h3 class="entry-title">University of Maryland, College Park</h3>
+            <p class="entry-sub">B.S. Computer Science (Machine Learning) · Minor in Business</p>
+            <p>Presidential Scholar.</p>
           </div>
-          <p>B.S. in Computer Science (Machine Learning), Minor in Business. Presidential Scholar.</p>
         </li>
       </ul>
-      <h3>Certifications</h3>
-      <ul class="plain-list" id="certList"></ul>
+      <h3 class="subhead">Certifications</h3>
+      <ul class="cert-list" id="certList"></ul>
     </section>
 
     <section id="skills">
@@ -134,12 +138,13 @@
 
     <section id="contact">
       <h2>Contact</h2>
-      <p>
-        The best way to reach me is by email at
-        <a href="mailto:alecagayan24@gmail.com">alecagayan24@gmail.com</a>.
-        You can also find me on <a href="https://github.com/alecagayan" target="_blank" rel="noopener">GitHub</a>
-        and <a href="https://linkedin.com/in/alecagayan" target="_blank" rel="noopener">LinkedIn</a>.
-      </p>
+      <div class="card contact-card">
+        <div>
+          <p class="contact-title">Get in touch</p>
+          <p class="muted">Email is the best way to reach me. I usually reply within a day.</p>
+        </div>
+        <a class="btn btn-primary" href="mailto:alecagayan24@gmail.com">alecagayan24@gmail.com</a>
+      </div>
     </section>
   </main>
 
