@@ -49,6 +49,17 @@
     ]
   },
   {
+    "category": "Networking",
+    "skills": [
+      "Cisco IOS-XR",
+      "Cisco IOS",
+      "BGP",
+      "OSPF",
+      "VLANs & subnetting",
+      "Circuit troubleshooting"
+    ]
+  },
+  {
     "category": "Tools & Practice",
     "skills": [
       "Git",

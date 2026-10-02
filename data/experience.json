@@ -1,5 +1,17 @@
 [
   {
+    "role": "Tier 1 NOC Engineer",
+    "company": "Visionary Solutions",
+    "location": "Herndon, VA",
+    "dates": "Current",
+    "bullets": [
+      "Monitor and troubleshoot a service-provider network on rotating 10-hour shifts, including overnights.",
+      "Diagnose Cisco IOS-XR routers and troubleshoot BGP and OSPF issues such as neighbor flaps, route withdrawals, and adjacency problems.",
+      "Investigate circuit outages, isolating customer, carrier, and internal faults using optical levels, interface errors, and logs.",
+      "Execute change requests with pre-checks, post-checks, and rollback plans, and maintain topology documentation, tickets, and shift handoff notes."
+    ]
+  },
+  {
     "role": "Network Engineering Intern",
     "company": "Visionary Solutions",
     "location": "Herndon, VA",
