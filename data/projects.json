@@ -56,8 +56,7 @@
     "links": [
       {
         "label": "Live demo",
-        "url": "#demos",
-        "demo": "skin"
+        "url": "#demo"
       },
       {
         "label": "GitHub",
@@ -112,11 +111,10 @@
   {
     "title": "This Portfolio",
     "year": "2026",
-    "description": "This site. Plain HTML, CSS, and JavaScript with no framework or build step. Content is loaded from JSON files, and the demos below are written from scratch.",
+    "description": "This site. Plain HTML, CSS, and JavaScript with no framework or build step, with content loaded from JSON files.",
     "tags": [
       "JavaScript",
-      "HTML & CSS",
-      "WebGL"
+      "HTML & CSS"
     ],
     "links": [
       {

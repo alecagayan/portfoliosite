@@ -29,7 +29,7 @@
       <a href="#top" class="name">Alec Agayan</a>
       <nav aria-label="Primary">
         <a href="#projects">Projects</a>
-        <a href="#demos">Demos</a>
+        <a href="#demo">Demo</a>
         <a href="#experience">Experience</a>
         <a href="#contact">Contact</a>
         <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
@@ -72,19 +72,9 @@
       <ul class="project-list" id="projectList"></ul>
     </section>
 
-    <section id="demos">
-      <h2>Demos</h2>
-      <p class="muted">Small projects that run in the browser. Each is written from scratch, apart from TensorFlow.js for the classifier.</p>
-
-      <div class="tabs" role="tablist" aria-label="Demos" id="labTabs">
-        <button type="button" role="tab" class="lab-tab" id="tab-skin" aria-controls="panel-skin" aria-selected="true">Skin lesion classifier</button>
-        <button type="button" role="tab" class="lab-tab" id="tab-c4" aria-controls="panel-c4" aria-selected="false" tabindex="-1">Connect Four</button>
-        <button type="button" role="tab" class="lab-tab" id="tab-huffman" aria-controls="panel-huffman" aria-selected="false" tabindex="-1">Huffman coding</button>
-        <button type="button" role="tab" class="lab-tab" id="tab-fractal" aria-controls="panel-fractal" aria-selected="false" tabindex="-1">Mandelbrot set</button>
-      </div>
-
-      <!-- Skin lesion classifier -->
-      <div class="lab-panel" role="tabpanel" id="panel-skin" aria-labelledby="tab-skin" tabindex="0">
+    <section id="demo">
+      <h2>Live demo: skin lesion classifier</h2>
+      <div id="panel-skin">
         <p>
           The CNN from my skin cancer detection project, trained on the HAM10000 dataset to sort
           dermatoscopic images into seven lesion types, running in the browser with TensorFlow.js.
@@ -113,82 +103,6 @@
           </div>
         </div>
         <p class="fineprint">For demonstration only. Not a medical device.</p>
-      </div>
-
-      <!-- Connect Four -->
-      <div class="lab-panel" role="tabpanel" id="panel-c4" aria-labelledby="tab-c4" tabindex="0" hidden>
-        <p>
-          Play against a minimax search with alpha-beta pruning and a hand-tuned evaluation
-          function. Click a column, or focus the board and use the arrow keys and Enter.
-        </p>
-        <div class="controls">
-          <div id="c4Difficulty" role="radiogroup" aria-label="Difficulty" class="radios">
-            <button type="button" role="radio" aria-checked="false" data-depth="2">Easy</button>
-            <button type="button" role="radio" aria-checked="true" data-depth="4">Medium</button>
-            <button type="button" role="radio" aria-checked="false" data-depth="8">Hard</button>
-          </div>
-          <button type="button" class="btn" id="c4Reset">New game</button>
-        </div>
-        <div class="c4-board" id="c4Board" tabindex="0" role="grid" aria-label="Connect Four board. Use left and right arrows to choose a column and Enter to drop."></div>
-        <p class="status-line" id="c4Status" aria-live="polite">Your move.</p>
-        <p class="muted small">
-          You <span id="c4You">0</span> · AI <span id="c4Ai">0</span> · Draws <span id="c4Draw">0</span>
-        </p>
-        <p class="muted small" id="c4Stats"></p>
-      </div>
-
-      <!-- Huffman -->
-      <div class="lab-panel" role="tabpanel" id="panel-huffman" aria-labelledby="tab-huffman" tabindex="0" hidden>
-        <p>
-          Builds a Huffman tree with a binary min-heap, encodes the text, and decodes it again to
-          check the result. Updates as you type.
-        </p>
-        <label class="sr-only" for="hufInput">Text to compress</label>
-        <textarea id="hufInput" class="field" rows="3" maxlength="400" spellcheck="false">she sells sea shells by the sea shore</textarea>
-        <div class="row-actions">
-          <span class="muted small">Examples:</span>
-          <button type="button" class="btn btn-small" data-huf-sample="she sells sea shells by the sea shore">sea shells</button>
-          <button type="button" class="btn btn-small" data-huf-sample="abracadabra">abracadabra</button>
-          <button type="button" class="btn btn-small" data-huf-sample="mississippi mississippi mississippi">mississippi</button>
-        </div>
-        <div class="huf-out" id="hufOut">
-          <div class="stat-row" id="hufStats"></div>
-          <div class="huf-meter" aria-hidden="true"><span id="hufMeter"></span></div>
-          <canvas id="hufTree" class="huf-tree" role="img" aria-label="Huffman tree diagram"></canvas>
-          <div class="huf-grid">
-            <div class="table-wrap">
-              <table class="table">
-                <thead><tr><th scope="col">Char</th><th scope="col">Count</th><th scope="col">Code</th></tr></thead>
-                <tbody id="hufTable"></tbody>
-              </table>
-            </div>
-            <div>
-              <p class="small muted">Encoded bits</p>
-              <p class="bitstream mono" id="hufBits"></p>
-              <p class="verify" id="hufVerify"></p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Fractal -->
-      <div class="lab-panel" role="tabpanel" id="panel-fractal" aria-labelledby="tab-fractal" tabindex="0" hidden>
-        <p>
-          A Mandelbrot and Julia set renderer written as a WebGL fragment shader. Scroll or pinch
-          to zoom, drag to pan, and double-click to zoom in on a point.
-        </p>
-        <div class="controls">
-          <div id="frPreset" role="radiogroup" aria-label="Fractal" class="radios">
-            <button type="button" role="radio" aria-checked="true" data-preset="mandelbrot">Mandelbrot</button>
-            <button type="button" role="radio" aria-checked="false" data-preset="julia-spiral">Julia (spiral)</button>
-            <button type="button" role="radio" aria-checked="false" data-preset="julia-rabbit">Julia (rabbit)</button>
-          </div>
-          <button type="button" class="btn" id="frReset">Reset</button>
-        </div>
-        <div class="fr-frame">
-          <canvas id="frCanvas" class="fr-canvas" aria-label="Interactive fractal render"></canvas>
-        </div>
-        <p class="muted small mono" id="frHud"></p>
       </div>
     </section>
 

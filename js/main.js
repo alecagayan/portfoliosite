@@ -1,4 +1,4 @@
-import { $, $$, el, whenNear } from './util.js';
+import { $, el, whenNear } from './util.js';
 
 /* Theme toggle. With no saved choice the page follows the OS setting. */
 const root = document.documentElement;
@@ -37,7 +37,6 @@ function renderProjects(projects) {
               text: link.label,
               target: internal ? null : '_blank',
               rel: internal ? null : 'noopener',
-              onclick: link.demo ? () => selectTab(`tab-${link.demo}`) : null,
             });
           })
         )
@@ -86,62 +85,10 @@ Promise.all(['projects', 'experience', 'certifications', 'skills'].map((name) =>
     $('#projectList').replaceChildren(el('li', { class: 'muted', text: 'Projects could not be loaded. Try refreshing the page.' }));
   });
 
-/* Demo tabs (WAI-ARIA tabs pattern). Each demo's code loads the first time it's shown. */
-const tabs = $$('.lab-tab');
-const demoModules = {
-  'panel-skin': () => import('./lab/skin.js'),
-  'panel-c4': () => import('./lab/connect4.js'),
-  'panel-huffman': () => import('./lab/huffman.js'),
-  'panel-fractal': () => import('./lab/fractal.js'),
-};
-const demos = new Map();
-
-function ensureDemo(panelId) {
-  if (!demos.has(panelId)) {
-    demos.set(
-      panelId,
-      demoModules[panelId]()
-        .then((mod) => mod.init(document.getElementById(panelId)))
-        .catch((err) => {
-          console.error(`Could not start ${panelId}`, err);
-          return null;
-        })
-    );
-  }
-  return demos.get(panelId);
-}
-
-function selectTab(tabId, focus = false) {
-  const tab = document.getElementById(tabId);
-  if (!tab) return;
-  tabs.forEach((t) => {
-    const selected = t === tab;
-    t.setAttribute('aria-selected', String(selected));
-    t.tabIndex = selected ? 0 : -1;
-    document.getElementById(t.getAttribute('aria-controls')).hidden = !selected;
-  });
-  if (focus) tab.focus();
-  const panelId = tab.getAttribute('aria-controls');
-  // Panels hidden at load have zero size, so tell the demo it's visible now
-  ensureDemo(panelId).then((demo) => demo?.shown?.());
-  demos.forEach((p, id) => {
-    if (id !== panelId) p.then((demo) => demo?.hidden?.());
-  });
-}
-
-tabs.forEach((tab, i) => {
-  tab.addEventListener('click', () => selectTab(tab.id));
-  tab.addEventListener('keydown', (e) => {
-    const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-    let target = null;
-    if (step) target = tabs[(i + step + tabs.length) % tabs.length];
-    else if (e.key === 'Home') target = tabs[0];
-    else if (e.key === 'End') target = tabs[tabs.length - 1];
-    if (!target) return;
-    e.preventDefault();
-    selectTab(target.id, true);
-  });
-});
-
-// Nothing in the demos (including TensorFlow.js) loads until you scroll near them
-whenNear($('#demos'), () => selectTab($('.lab-tab[aria-selected="true"]').id), '300px');
+/* Skin lesion classifier demo. Its code, TensorFlow.js and the model only load
+   once you scroll near it. */
+whenNear($('#demo'), () => {
+  import('./lab/skin.js')
+    .then((mod) => mod.init($('#panel-skin')))
+    .catch((err) => console.error('Could not start the demo', err));
+}, '300px');

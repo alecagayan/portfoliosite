@@ -1,9 +1,6 @@
 // Small shared helpers. Nothing here touches the DOM at import time.
 
 export const $ = (sel, root = document) => root.querySelector(sel);
-export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-
-export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 // Tiny element factory: el('li', { class: 'x', text: 'hi' }, child1, child2)
 export function el(tag, props = {}, ...children) {
@@ -21,28 +18,6 @@ export function el(tag, props = {}, ...children) {
     node.append(child instanceof Node ? child : document.createTextNode(String(child)));
   }
   return node;
-}
-
-// Reads a CSS custom property off <html>, e.g. cssVar('--accent')
-export function cssVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-export function hexToRgb(hex) {
-  const h = hex.replace('#', '').trim();
-  const full = h.length === 3 ? [...h].map((c) => c + c).join('') : h;
-  const n = parseInt(full, 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-
-// Calls fn whenever the colors change: the toggle sets data-theme, the OS
-// setting applies when no choice has been saved
-export function onThemeChange(fn) {
-  new MutationObserver(fn).observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-  });
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fn);
 }
 
 // Runs fn once, the first time `target` scrolls near the viewport
