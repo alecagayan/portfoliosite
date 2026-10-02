@@ -1,18 +1,64 @@
 [
   {
     "category": "Languages",
-    "skills": ["Python", "Java", "JavaScript", "TypeScript", "Swift", "C / C++", "Rust", "OCaml", "SQL", "HTML & CSS"]
+    "skills": [
+      "Python",
+      "Java",
+      "JavaScript",
+      "TypeScript",
+      "Swift",
+      "C / C++",
+      "Rust",
+      "OCaml",
+      "SQL",
+      "HTML & CSS"
+    ]
   },
   {
     "category": "Frameworks & ML",
-    "skills": ["React", "SwiftUI", "Node.js", "Express", "Flask", "TensorFlow", "Keras", "PyTorch", "NumPy", "Pandas", "Scikit-learn", "JUnit"]
+    "skills": [
+      "React",
+      "SwiftUI",
+      "Core ML",
+      "SwiftData",
+      "Node.js",
+      "Express",
+      "Flask",
+      "TensorFlow",
+      "Keras",
+      "PyTorch",
+      "NumPy",
+      "Pandas",
+      "Scikit-learn",
+      "JUnit"
+    ]
   },
   {
     "category": "Cloud & Data",
-    "skills": ["AWS EC2", "AWS S3", "AWS Lambda", "SageMaker", "Kinesis", "MySQL", "PostgreSQL", "MongoDB", "Firebase"]
+    "skills": [
+      "AWS EC2",
+      "AWS S3",
+      "AWS Lambda",
+      "SageMaker",
+      "Kinesis",
+      "MySQL",
+      "PostgreSQL",
+      "MongoDB",
+      "Firebase",
+      "Supabase"
+    ]
   },
   {
     "category": "Tools & Practice",
-    "skills": ["Git", "Docker", "Linux", "WebGL", "REST APIs", "Unit Testing", "CI/CD", "Agile / Scrum"]
+    "skills": [
+      "Git",
+      "Docker",
+      "Linux",
+      "WebGL",
+      "REST APIs",
+      "Unit Testing",
+      "CI/CD",
+      "Agile / Scrum"
+    ]
   }
 ]

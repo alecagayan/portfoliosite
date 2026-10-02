@@ -1,5 +1,48 @@
 [
   {
+    "title": "Tailwind",
+    "year": "2026",
+    "description": "An iPhone drive logbook. It records drives automatically (route, speed, corners, elevation), scores each one out of 100, and keeps them in a logbook with records, medals and a garage of cars. Runs on the Lock Screen, in CarPlay, on Apple Watch and in widgets.",
+    "tags": [
+      "Swift",
+      "SwiftUI",
+      "SwiftData",
+      "Metal",
+      "Supabase",
+      "StoreKit 2"
+    ],
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/alecagayan/Tailwind"
+      }
+    ]
+  },
+  {
+    "title": "Regimen",
+    "year": "2026",
+    "description": "An iOS skincare app that orders your routine, flags ingredient conflicts between products, and predicts when you'll run out. Progress photos are scored on-device with a Core ML model, giving a 0–100 score and per-zone results tracked over time.",
+    "tags": [
+      "Swift",
+      "SwiftUI",
+      "Core ML",
+      "Vision",
+      "WidgetKit",
+      "Supabase",
+      "StoreKit"
+    ],
+    "links": [
+      {
+        "label": "Website",
+        "url": "https://alecagayan.github.io/Regimen/"
+      },
+      {
+        "label": "GitHub",
+        "url": "https://github.com/alecagayan/Regimen"
+      }
+    ]
+  },
+  {
     "title": "Skin Cancer Detection Model",
     "year": "2020",
     "description": "A convolutional neural network trained on 10,000+ dermoscopic images across 7 classes of skin lesions, reaching 89% classification accuracy. There's a live demo below.",
