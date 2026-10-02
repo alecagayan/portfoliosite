@@ -3,462 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Alec Agayan: Software Engineer</title>
-  <meta name="description" content="Alec Agayan is a software engineer and recent University of Maryland CS graduate (machine learning) who builds full-stack apps and ML systems." />
-  <meta name="theme-color" content="#f3f1ea" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#0d0d0b" media="(prefers-color-scheme: dark)" />
+  <title>Alec Agayan</title>
+  <meta name="description" content="Alec Agayan is a software engineer and University of Maryland computer science graduate." />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Alec Agayan: Software Engineer" />
-  <meta property="og:description" content="Full-stack apps, machine learning, and a lab of things you can play with in the browser." />
+  <meta property="og:title" content="Alec Agayan" />
+  <meta property="og:description" content="Software engineer. B.S. Computer Science, University of Maryland." />
   <meta property="og:image" content="assets/og.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Alec Agayan: Software Engineer" />
-  <meta name="twitter:description" content="Full-stack apps, machine learning, and a lab of things you can play with in the browser." />
-  <meta name="twitter:image" content="assets/og.jpg" />
 
-  <!-- Set the theme before first paint so there's no light/dark flash -->
   <script>
     (function () {
       var saved = null;
       try { saved = localStorage.getItem('theme'); } catch (e) {}
-      var light = window.matchMedia('(prefers-color-scheme: light)').matches;
-      document.documentElement.setAttribute('data-theme', saved || (light ? 'light' : 'dark'));
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
     })();
   </script>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" />
   <link rel="stylesheet" href="css/site.css" />
   <script type="module" src="js/main.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#work">Skip to content</a>
-
-  <header class="topbar" id="topbar">
-    <div class="wrap topbar-inner">
-      <a href="#top" class="wordmark" aria-label="Alec Agayan, back to top">
-        <span class="wordmark-mark" aria-hidden="true">A</span>
-        <span class="wordmark-name">Alec Agayan</span>
-      </a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#top" class="name">Alec Agayan</a>
       <nav aria-label="Primary">
-        <ul class="nav-links">
-          <li><a href="#work">Work</a></li>
-          <li><a href="#lab">Lab</a></li>
-          <li><a href="#experience">Experience</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
+        <a href="#projects">Projects</a>
+        <a href="#demos">Demos</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" /></svg>
+        </button>
       </nav>
-      <div class="topbar-actions">
-        <button type="button" class="icon-btn kbd-btn" id="cmdkTrigger" aria-label="Open command menu" title="Command menu">
-          <kbd id="cmdkKey">⌘K</kbd>
-        </button>
-        <button type="button" class="icon-btn" id="themeToggle" aria-label="Switch color theme" title="Switch theme">
-          <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" /></svg>
-          <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 0 1 9.4 3.8a8.4 8.4 0 1 0 10.8 10.8Z" /></svg>
-        </button>
-      </div>
     </div>
-    <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   </header>
 
-  <main id="top">
-    <!-- HERO -->
-    <section class="hero" aria-labelledby="heroTitle">
-      <canvas class="hero-field" id="heroField" aria-hidden="true"></canvas>
-      <div class="wrap hero-inner">
-        <p class="kicker">
-          <span class="status-dot" aria-hidden="true"></span>
-          Open to new-grad software engineering roles
+  <main id="top" class="container">
+    <section class="intro">
+      <img class="avatar" src="assets/img/avatar.jpg" width="120" height="120" alt="Alec Agayan" />
+      <div>
+        <h1>Alec Agayan</h1>
+        <p class="lead">Software engineer based in Northern Virginia.</p>
+      </div>
+    </section>
+
+    <section class="bio">
+      <p>
+        I graduated from the University of Maryland in May 2026 with a B.S. in Computer Science,
+        concentrating in machine learning, and a minor in Business. I've built full-stack web
+        apps, iOS apps, and machine learning models, and I hold the AWS Solutions Architect
+        Associate and Machine Learning Specialty certifications.
+      </p>
+      <p>
+        Previously I was a network engineering intern at Visionary Solutions and taught Python and
+        Java at Fairfax Collegiate. I'm currently looking for a new-grad software engineering role.
+      </p>
+      <p class="links">
+        <a href="mailto:alecagayan24@gmail.com">Email</a>
+        <a href="https://github.com/alecagayan" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/in/alecagayan" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="assets/Agayan_Alec_Resume.pdf">Résumé (PDF)</a>
+      </p>
+    </section>
+
+    <section id="projects">
+      <h2>Projects</h2>
+      <ul class="project-list" id="projectList"></ul>
+    </section>
+
+    <section id="demos">
+      <h2>Demos</h2>
+      <p class="muted">Small projects that run in the browser. Each is written from scratch, apart from TensorFlow.js for the classifier.</p>
+
+      <div class="tabs" role="tablist" aria-label="Demos" id="labTabs">
+        <button type="button" role="tab" class="lab-tab" id="tab-skin" aria-controls="panel-skin" aria-selected="true">Skin lesion classifier</button>
+        <button type="button" role="tab" class="lab-tab" id="tab-c4" aria-controls="panel-c4" aria-selected="false" tabindex="-1">Connect Four</button>
+        <button type="button" role="tab" class="lab-tab" id="tab-huffman" aria-controls="panel-huffman" aria-selected="false" tabindex="-1">Huffman coding</button>
+        <button type="button" role="tab" class="lab-tab" id="tab-fractal" aria-controls="panel-fractal" aria-selected="false" tabindex="-1">Mandelbrot set</button>
+      </div>
+
+      <!-- Skin lesion classifier -->
+      <div class="lab-panel" role="tabpanel" id="panel-skin" aria-labelledby="tab-skin" tabindex="0">
+        <p>
+          The CNN from my skin cancer detection project, trained on the HAM10000 dataset to sort
+          dermatoscopic images into seven lesion types, running in the browser with TensorFlow.js.
+          Sample images are blurred until you click them.
         </p>
-        <h1 class="hero-title" id="heroTitle">
-          <span class="line"><span>Alec Agayan</span></span>
-          <span class="line"><span>builds <em>models</em>,</span></span>
-          <span class="line"><span>and the <em>apps</em> around them.</span></span>
-        </h1>
-        <div class="hero-grid">
-          <p class="hero-lede">
-            Software engineer and fresh University of Maryland CS grad with a concentration in
-            machine learning. I like taking an idea all the way to something real: a full-stack web
-            app, an iOS client, or a neural net you can run in your browser, a few sections down.
-          </p>
-          <dl class="hero-meta">
-            <div><dt>Based in</dt><dd>Northern Virginia</dd></div>
-            <div><dt>Local time</dt><dd id="heroTime">--:--</dd></div>
-            <div><dt>Education</dt><dd>B.S. CS, UMD ’26</dd></div>
-            <div><dt>Certified</dt><dd>AWS SA · AWS ML</dd></div>
-          </dl>
-        </div>
-        <div class="hero-actions">
-          <a href="#work" class="btn btn-solid">
-            See the work
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
-          </a>
-          <a href="assets/Agayan_Alec_Resume.pdf" class="btn btn-ghost" download>
-            Résumé
-            <span class="btn-meta">PDF</span>
-          </a>
-          <p class="hero-hint">or press <kbd class="kbd-inline" id="heroKbd">⌘K</kbd> to jump anywhere</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- MARQUEE -->
-    <div class="ticker" aria-hidden="true">
-      <div class="ticker-track" id="tickerTrack"></div>
-    </div>
-
-    <!-- WORK -->
-    <section id="work" class="section" aria-labelledby="workTitle">
-      <div class="wrap">
-        <header class="section-head">
-          <p class="section-label"><span>01</span> Selected work</p>
-          <div>
-            <h2 class="section-title" id="workTitle">Things I’ve <em>built</em>.</h2>
-            <p class="section-sub">Click any project for the full write-up. Filter by what it’s made with.</p>
-          </div>
-        </header>
-        <div class="filter-bar" id="workFilters" role="toolbar" aria-label="Filter projects by technology"></div>
-        <ol class="work-list" id="workList" aria-live="polite">
-          <li class="skeleton skeleton-row"></li>
-          <li class="skeleton skeleton-row"></li>
-          <li class="skeleton skeleton-row"></li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- LAB -->
-    <section id="lab" class="section section-lab" aria-labelledby="labTitle">
-      <div class="wrap">
-        <header class="section-head">
-          <p class="section-label"><span>02</span> The lab</p>
-          <div>
-            <h2 class="section-title" id="labTitle">Don’t take my word for it. <em>Play.</em></h2>
-            <p class="section-sub">
-              Four things I built from scratch that run entirely in your browser. No servers, no
-              game engines, no compression libraries: just the algorithms.
-            </p>
-          </div>
-        </header>
-
-        <div class="lab">
-          <div class="lab-tabs" role="tablist" aria-label="Experiments" id="labTabs">
-            <button type="button" role="tab" class="lab-tab" id="tab-skin" aria-controls="panel-skin" aria-selected="true">
-              <span class="lab-tab-num">L1</span>
-              <span class="lab-tab-name">Skin lesion classifier</span>
-              <span class="lab-tab-tech">CNN · TensorFlow.js</span>
-            </button>
-            <button type="button" role="tab" class="lab-tab" id="tab-c4" aria-controls="panel-c4" aria-selected="false" tabindex="-1">
-              <span class="lab-tab-num">L2</span>
-              <span class="lab-tab-name">Connect Four AI</span>
-              <span class="lab-tab-tech">Minimax · α-β pruning</span>
-            </button>
-            <button type="button" role="tab" class="lab-tab" id="tab-huffman" aria-controls="panel-huffman" aria-selected="false" tabindex="-1">
-              <span class="lab-tab-num">L3</span>
-              <span class="lab-tab-name">Huffman compressor</span>
-              <span class="lab-tab-tech">Min-heap · prefix codes</span>
-            </button>
-            <button type="button" role="tab" class="lab-tab" id="tab-fractal" aria-controls="panel-fractal" aria-selected="false" tabindex="-1">
-              <span class="lab-tab-num">L4</span>
-              <span class="lab-tab-name">Fractal explorer</span>
-              <span class="lab-tab-tech">WebGL · GLSL</span>
-            </button>
-            <p class="lab-note">
-              Everything here runs client-side.
-              <a href="https://github.com/alecagayan/portfoliosite/tree/main/js/lab" target="_blank" rel="noopener">Read the source ↗</a>
-            </p>
-          </div>
-
-          <div class="lab-stage">
-            <!-- L1: Skin lesion classifier -->
-            <div class="lab-panel is-active" role="tabpanel" id="panel-skin" aria-labelledby="tab-skin" tabindex="0">
-              <div class="panel-head">
-                <h3>Skin lesion classifier</h3>
-                <p>
-                  The real model from my Skin Cancer Detection project: a CNN trained on the
-                  <strong>HAM10000</strong> dataset that sorts dermatoscopic images into seven lesion
-                  types. Upload a photo or pull a random sample. Samples are blurred by default; click to reveal.
-                </p>
-              </div>
-              <div class="skin">
-                <div class="skin-left">
-                  <div class="dropzone" id="skinDropzone" role="button" tabindex="0" aria-label="Upload an image to classify">
-                    <img id="skinPreview" alt="Selected skin lesion image" hidden />
-                    <button type="button" class="reveal-btn" id="skinReveal" hidden>
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /><path d="M3 3l18 18" /></svg>
-                      Click to reveal
-                    </button>
-                    <span class="dropzone-label" id="skinDropLabel">
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></svg>
-                      Drop an image, or click to upload
-                    </span>
-                    <span class="scanline" aria-hidden="true"></span>
-                  </div>
-                  <input type="file" id="skinFile" accept="image/*" hidden />
-                  <div class="row-actions">
-                    <button type="button" class="btn btn-small btn-solid" id="skinSample">Random sample</button>
-                    <button type="button" class="btn btn-small btn-ghost" id="skinClear">Clear</button>
-                  </div>
-                </div>
-                <div class="skin-right" aria-live="polite">
-                  <p class="muted" id="skinStatus">Upload a dermatoscopic image to classify it.</p>
-                  <div class="skin-result" id="skinResult" hidden>
-                    <p class="eyebrow">Top prediction</p>
-                    <p class="skin-label" id="skinLabel"></p>
-                    <p class="skin-conf" id="skinConf"></p>
-                    <ul class="bars" id="skinBars"></ul>
-                  </div>
-                </div>
-              </div>
-              <p class="fineprint">A demo, not a medical device. Please see a dermatologist about anything you’re worried about.</p>
+        <div class="skin">
+          <div class="skin-left">
+            <div class="dropzone" id="skinDropzone" role="button" tabindex="0" aria-label="Upload an image to classify">
+              <img id="skinPreview" alt="Selected skin lesion image" hidden />
+              <button type="button" class="reveal-btn" id="skinReveal" hidden>Click to show image</button>
+              <span class="dropzone-label" id="skinDropLabel">Drop an image here or click to upload</span>
             </div>
-
-            <!-- L2: Connect Four -->
-            <div class="lab-panel" role="tabpanel" id="panel-c4" aria-labelledby="tab-c4" tabindex="0" hidden>
-              <div class="panel-head">
-                <h3>Connect Four AI</h3>
-                <p>
-                  An opponent I wrote from scratch. It searches the game tree with
-                  <strong>minimax and alpha-beta pruning</strong>, ordering moves center-first for
-                  faster cutoffs, and scores positions with a heuristic I tuned by hand. Use the mouse,
-                  or focus the board and use <kbd class="kbd-inline">←</kbd> <kbd class="kbd-inline">→</kbd> <kbd class="kbd-inline">Enter</kbd>.
-                </p>
-              </div>
-              <div class="c4-wrap">
-                <div class="c4-side">
-                  <div class="segmented" id="c4Difficulty" role="radiogroup" aria-label="Difficulty">
-                    <button type="button" role="radio" aria-checked="false" data-depth="2">Easy</button>
-                    <button type="button" role="radio" aria-checked="true" data-depth="4">Medium</button>
-                    <button type="button" role="radio" aria-checked="false" data-depth="8">Hard</button>
-                  </div>
-                  <dl class="c4-score">
-                    <div><dt>You</dt><dd id="c4You">0</dd></div>
-                    <div><dt>AI</dt><dd id="c4Ai">0</dd></div>
-                    <div><dt>Draw</dt><dd id="c4Draw">0</dd></div>
-                  </dl>
-                  <p class="c4-stats mono" id="c4Stats">Search stats appear after the AI moves.</p>
-                  <button type="button" class="btn btn-small btn-ghost" id="c4Reset">New game</button>
-                </div>
-                <div class="c4-board-wrap">
-                  <div class="c4-board" id="c4Board" tabindex="0" role="grid" aria-label="Connect Four board. Use left and right arrows to choose a column and Enter to drop."></div>
-                  <p class="status-line" id="c4Status" aria-live="polite">Your move. You’re orange.</p>
-                </div>
-              </div>
+            <input type="file" id="skinFile" accept="image/*" hidden />
+            <div class="row-actions">
+              <button type="button" class="btn" id="skinSample">Random sample</button>
+              <button type="button" class="btn" id="skinClear">Clear</button>
             </div>
-
-            <!-- L3: Huffman -->
-            <div class="lab-panel" role="tabpanel" id="panel-huffman" aria-labelledby="tab-huffman" tabindex="0" hidden>
-              <div class="panel-head">
-                <h3>Huffman compressor</h3>
-                <p>
-                  Builds an optimal prefix-code tree with a binary <strong>min-heap</strong> I wrote by
-                  hand, encodes your text into actual bits, then decodes those bits to prove the round
-                  trip is lossless. It updates as you type.
-                </p>
-              </div>
-              <div class="huf">
-                <label class="sr-only" for="hufInput">Text to compress</label>
-                <textarea id="hufInput" class="field" rows="3" maxlength="400" spellcheck="false">she sells sea shells by the sea shore</textarea>
-                <div class="row-actions">
-                  <button type="button" class="btn btn-small btn-ghost" data-huf-sample="she sells sea shells by the sea shore">Sea shells</button>
-                  <button type="button" class="btn btn-small btn-ghost" data-huf-sample="abracadabra">abracadabra</button>
-                  <button type="button" class="btn btn-small btn-ghost" data-huf-sample="the quick brown fox jumps over the lazy dog">Pangram</button>
-                  <button type="button" class="btn btn-small btn-ghost" data-huf-sample="mississippi mississippi mississippi">mississippi</button>
-                </div>
-                <div class="huf-out" id="hufOut">
-                  <div class="stat-row" id="hufStats"></div>
-                  <div class="huf-meter" aria-hidden="true"><span id="hufMeter"></span></div>
-                  <canvas id="hufTree" class="huf-tree" role="img" aria-label="Huffman tree diagram"></canvas>
-                  <div class="huf-grid">
-                    <div class="table-wrap">
-                      <table class="table">
-                        <thead><tr><th scope="col">Char</th><th scope="col">Freq</th><th scope="col">Code</th></tr></thead>
-                        <tbody id="hufTable"></tbody>
-                      </table>
-                    </div>
-                    <div>
-                      <p class="eyebrow">Encoded bitstream</p>
-                      <p class="bitstream mono" id="hufBits"></p>
-                      <p class="verify" id="hufVerify"></p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- L4: Fractal -->
-            <div class="lab-panel" role="tabpanel" id="panel-fractal" aria-labelledby="tab-fractal" tabindex="0" hidden>
-              <div class="panel-head">
-                <h3>Fractal explorer</h3>
-                <p>
-                  A real-time Mandelbrot and Julia renderer. Raw WebGL and a hand-written GLSL
-                  fragment shader run escape-time iteration for every pixel on the GPU. Scroll or
-                  pinch to zoom, drag to pan, double-click to dive in.
-                </p>
-              </div>
-              <div class="fr-controls">
-                <div class="segmented" id="frPreset" role="radiogroup" aria-label="Fractal">
-                  <button type="button" role="radio" aria-checked="true" data-preset="mandelbrot">Mandelbrot</button>
-                  <button type="button" role="radio" aria-checked="false" data-preset="julia-spiral">Spiral</button>
-                  <button type="button" role="radio" aria-checked="false" data-preset="julia-rabbit">Rabbit</button>
-                  <button type="button" role="radio" aria-checked="false" data-preset="julia-feather">Feather</button>
-                </div>
-                <button type="button" class="btn btn-small btn-ghost" id="frReset">Reset view</button>
-              </div>
-              <div class="fr-frame">
-                <canvas id="frCanvas" class="fr-canvas" aria-label="Interactive fractal render"></canvas>
-                <p class="fr-hud mono" id="frHud" aria-live="off"></p>
-              </div>
+          </div>
+          <div class="skin-right" aria-live="polite">
+            <p class="muted" id="skinStatus">Upload a dermatoscopic image to classify it.</p>
+            <div class="skin-result" id="skinResult" hidden>
+              <p class="skin-label" id="skinLabel"></p>
+              <p class="skin-conf muted" id="skinConf"></p>
+              <ul class="bars" id="skinBars"></ul>
             </div>
           </div>
         </div>
+        <p class="fineprint">For demonstration only. Not a medical device.</p>
       </div>
-    </section>
 
-    <!-- EXPERIENCE -->
-    <section id="experience" class="section" aria-labelledby="expTitle">
-      <div class="wrap">
-        <header class="section-head">
-          <p class="section-label"><span>03</span> Experience</p>
-          <div>
-            <h2 class="section-title" id="expTitle">Where I’ve <em>worked</em>.</h2>
-          </div>
-        </header>
-        <ol class="timeline" id="experienceList">
-          <li class="skeleton skeleton-exp"></li>
-          <li class="skeleton skeleton-exp"></li>
-        </ol>
-      </div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="section" aria-labelledby="aboutTitle">
-      <div class="wrap">
-        <header class="section-head">
-          <p class="section-label"><span>04</span> About</p>
-          <div>
-            <h2 class="section-title" id="aboutTitle">A little more <em>context</em>.</h2>
-          </div>
-        </header>
-        <div class="about">
-          <figure class="portrait">
-            <picture>
-              <source srcset="assets/img/alec.webp" type="image/webp" />
-              <img src="assets/img/alec.jpg" width="720" height="900" alt="Alec Agayan leaning against a brick building in an orange shirt and black puffer jacket" loading="lazy" decoding="async" />
-            </picture>
-            <figcaption class="mono">Fig. 1: Author, in the site’s accent color.</figcaption>
-          </figure>
-          <div class="about-body">
-            <div class="prose">
-              <p>
-                I graduated from the University of Maryland, College Park in May 2026 with a B.S. in
-                Computer Science (machine learning concentration) and a minor in Business, as a
-                Presidential Scholar. Coursework took me through algorithms, operating systems,
-                security, parallel computing, and computer vision.
-              </p>
-              <p>
-                Outside class I interned on a network engineering team, built a handful of
-                projects end to end, and spent four summers teaching Python and Java to students of
-                all ages. Teaching made me good at explaining things, and at reading code I didn’t write.
-                Before college I led my high school’s FIRST Robotics team and founded its CyberPatriot team.
-              </p>
-              <p>
-                I pick up new languages and frameworks quickly, and I care about the unglamorous
-                parts too: tests, edge cases, and the last 10% that makes something feel finished.
-              </p>
-            </div>
-
-            <div class="about-cols">
-              <div>
-                <h3 class="mini-title">Certifications</h3>
-                <ul class="cert-list" id="certList"></ul>
-              </div>
-              <div>
-                <h3 class="mini-title">Education</h3>
-                <ul class="cert-list">
-                  <li>
-                    <span class="cert-name">University of Maryland, College Park</span>
-                    <span class="cert-meta">B.S. Computer Science (ML) · Minor in Business · May 2026</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stack" id="stack" aria-labelledby="stackTitle">
-          <h3 class="mini-title" id="stackTitle">Stack <span class="muted">· highlighted items filter the projects above</span></h3>
-          <div class="stack-grid" id="stackGrid"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section contact" aria-labelledby="contactTitle">
-      <div class="wrap">
-        <p class="section-label"><span>05</span> Contact</p>
-        <h2 class="contact-title" id="contactTitle">Let’s build <em>something</em>.</h2>
-        <p class="contact-copy">
-          I’m looking for a new-grad software engineering role. If you have an opening, a
-          question, or just want to say hi, my inbox is open.
+      <!-- Connect Four -->
+      <div class="lab-panel" role="tabpanel" id="panel-c4" aria-labelledby="tab-c4" tabindex="0" hidden>
+        <p>
+          Play against a minimax search with alpha-beta pruning and a hand-tuned evaluation
+          function. Click a column, or focus the board and use the arrow keys and Enter.
         </p>
-        <div class="contact-actions">
-          <button type="button" class="email-chip" id="copyEmail" data-email="alecagayan24@gmail.com">
-            <span class="email-text">alecagayan24@gmail.com</span>
-            <span class="email-action" id="copyEmailLabel">Copy</span>
-          </button>
-          <a class="btn btn-solid" href="mailto:alecagayan24@gmail.com">Send an email</a>
+        <div class="controls">
+          <div id="c4Difficulty" role="radiogroup" aria-label="Difficulty" class="radios">
+            <button type="button" role="radio" aria-checked="false" data-depth="2">Easy</button>
+            <button type="button" role="radio" aria-checked="true" data-depth="4">Medium</button>
+            <button type="button" role="radio" aria-checked="false" data-depth="8">Hard</button>
+          </div>
+          <button type="button" class="btn" id="c4Reset">New game</button>
         </div>
-        <ul class="socials">
-          <li><a href="https://github.com/alecagayan" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a></li>
-          <li><a href="https://linkedin.com/in/alecagayan" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a></li>
-          <li><a href="assets/Agayan_Alec_Resume.pdf" download>Résumé <span aria-hidden="true">↓</span></a></li>
-        </ul>
-        <p class="muted mono contact-time" id="contactTime"></p>
+        <div class="c4-board" id="c4Board" tabindex="0" role="grid" aria-label="Connect Four board. Use left and right arrows to choose a column and Enter to drop."></div>
+        <p class="status-line" id="c4Status" aria-live="polite">Your move.</p>
+        <p class="muted small">
+          You <span id="c4You">0</span> · AI <span id="c4Ai">0</span> · Draws <span id="c4Draw">0</span>
+        </p>
+        <p class="muted small" id="c4Stats"></p>
       </div>
+
+      <!-- Huffman -->
+      <div class="lab-panel" role="tabpanel" id="panel-huffman" aria-labelledby="tab-huffman" tabindex="0" hidden>
+        <p>
+          Builds a Huffman tree with a binary min-heap, encodes the text, and decodes it again to
+          check the result. Updates as you type.
+        </p>
+        <label class="sr-only" for="hufInput">Text to compress</label>
+        <textarea id="hufInput" class="field" rows="3" maxlength="400" spellcheck="false">she sells sea shells by the sea shore</textarea>
+        <div class="row-actions">
+          <span class="muted small">Examples:</span>
+          <button type="button" class="btn btn-small" data-huf-sample="she sells sea shells by the sea shore">sea shells</button>
+          <button type="button" class="btn btn-small" data-huf-sample="abracadabra">abracadabra</button>
+          <button type="button" class="btn btn-small" data-huf-sample="mississippi mississippi mississippi">mississippi</button>
+        </div>
+        <div class="huf-out" id="hufOut">
+          <div class="stat-row" id="hufStats"></div>
+          <div class="huf-meter" aria-hidden="true"><span id="hufMeter"></span></div>
+          <canvas id="hufTree" class="huf-tree" role="img" aria-label="Huffman tree diagram"></canvas>
+          <div class="huf-grid">
+            <div class="table-wrap">
+              <table class="table">
+                <thead><tr><th scope="col">Char</th><th scope="col">Count</th><th scope="col">Code</th></tr></thead>
+                <tbody id="hufTable"></tbody>
+              </table>
+            </div>
+            <div>
+              <p class="small muted">Encoded bits</p>
+              <p class="bitstream mono" id="hufBits"></p>
+              <p class="verify" id="hufVerify"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fractal -->
+      <div class="lab-panel" role="tabpanel" id="panel-fractal" aria-labelledby="tab-fractal" tabindex="0" hidden>
+        <p>
+          A Mandelbrot and Julia set renderer written as a WebGL fragment shader. Scroll or pinch
+          to zoom, drag to pan, and double-click to zoom in on a point.
+        </p>
+        <div class="controls">
+          <div id="frPreset" role="radiogroup" aria-label="Fractal" class="radios">
+            <button type="button" role="radio" aria-checked="true" data-preset="mandelbrot">Mandelbrot</button>
+            <button type="button" role="radio" aria-checked="false" data-preset="julia-spiral">Julia (spiral)</button>
+            <button type="button" role="radio" aria-checked="false" data-preset="julia-rabbit">Julia (rabbit)</button>
+          </div>
+          <button type="button" class="btn" id="frReset">Reset</button>
+        </div>
+        <div class="fr-frame">
+          <canvas id="frCanvas" class="fr-canvas" aria-label="Interactive fractal render"></canvas>
+        </div>
+        <p class="muted small mono" id="frHud"></p>
+      </div>
+    </section>
+
+    <section id="experience">
+      <h2>Experience</h2>
+      <ul class="entry-list" id="experienceList"></ul>
+    </section>
+
+    <section id="education">
+      <h2>Education</h2>
+      <ul class="entry-list">
+        <li class="entry">
+          <div class="entry-head">
+            <strong>University of Maryland, College Park</strong>
+            <span class="muted">May 2026</span>
+          </div>
+          <p>B.S. in Computer Science (Machine Learning), Minor in Business. Presidential Scholar.</p>
+        </li>
+      </ul>
+      <h3>Certifications</h3>
+      <ul class="plain-list" id="certList"></ul>
+    </section>
+
+    <section id="skills">
+      <h2>Skills</h2>
+      <dl class="skills" id="skillList"></dl>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>
+        The best way to reach me is by email at
+        <a href="mailto:alecagayan24@gmail.com">alecagayan24@gmail.com</a>.
+        You can also find me on <a href="https://github.com/alecagayan" target="_blank" rel="noopener">GitHub</a>
+        and <a href="https://linkedin.com/in/alecagayan" target="_blank" rel="noopener">LinkedIn</a>.
+      </p>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="wrap footer-inner">
-      <p>© <span id="year"></span> Alec Agayan</p>
-      <p class="muted">Hand-built with HTML, CSS &amp; JavaScript. No framework, no build step. <a href="https://github.com/alecagayan/portfoliosite" target="_blank" rel="noopener">Source ↗</a></p>
-    </div>
+  <footer class="container site-footer">
+    <p>© <span id="year"></span> Alec Agayan</p>
   </footer>
-
-  <!-- Command menu -->
-  <dialog class="cmdk" id="cmdk" aria-label="Command menu">
-    <div class="cmdk-search">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5" /></svg>
-      <input type="text" id="cmdkInput" placeholder="Search sections, projects, actions…" autocomplete="off" spellcheck="false"
-             role="combobox" aria-expanded="true" aria-controls="cmdkList" aria-autocomplete="list" />
-      <kbd class="kbd-inline">esc</kbd>
-    </div>
-    <ul class="cmdk-list" id="cmdkList" role="listbox"></ul>
-    <div class="cmdk-foot mono"><span><kbd class="kbd-inline">↑</kbd><kbd class="kbd-inline">↓</kbd> navigate</span><span><kbd class="kbd-inline">↵</kbd> select</span></div>
-  </dialog>
-
-  <!-- Project drawer -->
-  <dialog class="drawer" id="drawer" aria-labelledby="drawerTitle">
-    <div class="drawer-inner">
-      <div class="drawer-top">
-        <p class="mono muted" id="drawerMeta"></p>
-        <button type="button" class="icon-btn" id="drawerClose" aria-label="Close">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
-        </button>
-      </div>
-      <div class="drawer-cover" id="drawerCover" aria-hidden="true"></div>
-      <h3 class="drawer-title" id="drawerTitle"></h3>
-      <p class="drawer-details" id="drawerDetails"></p>
-      <ul class="drawer-highlights" id="drawerHighlights"></ul>
-      <ul class="tags" id="drawerTags"></ul>
-      <div class="drawer-links" id="drawerLinks"></div>
-    </div>
-  </dialog>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

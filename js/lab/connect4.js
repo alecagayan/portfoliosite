@@ -232,8 +232,8 @@ export function init(panel) {
     const row = engine.play(col, YOU);
     await dropDisc(row, col, YOU);
     const line = engine.winLine(row, col);
-    if (line) return endTurn(() => finish(line, 'You win! Nicely played.', 'you'));
-    if (engine.isFull()) return endTurn(() => finish(null, 'Draw. Evenly matched.', 'draw'));
+    if (line) return endTurn(() => finish(line, 'You win.', 'you'));
+    if (engine.isFull()) return endTurn(() => finish(null, 'Draw.', 'draw'));
 
     statusEl.textContent = 'AI is thinking…';
     // Yield a frame so the status text paints before the search blocks
@@ -245,8 +245,8 @@ export function init(panel) {
     }`;
     await dropDisc(aiRow, move.col, AI);
     const aiLine = engine.winLine(aiRow, move.col);
-    if (aiLine) return endTurn(() => finish(aiLine, 'The AI wins. Try again?', 'ai'));
-    if (engine.isFull()) return endTurn(() => finish(null, 'Draw. Evenly matched.', 'draw'));
+    if (aiLine) return endTurn(() => finish(aiLine, 'The AI wins.', 'ai'));
+    if (engine.isFull()) return endTurn(() => finish(null, 'Draw.', 'draw'));
     endTurn(() => {
       statusEl.textContent = 'Your move.';
     });
@@ -268,7 +268,7 @@ export function init(panel) {
       c.classList.remove('is-win');
       c.replaceChildren();
     });
-    statusEl.textContent = 'Your move. You’re orange.';
+    statusEl.textContent = 'Your move.';
   }
 
   $('#c4Reset', panel).addEventListener('click', newGame);

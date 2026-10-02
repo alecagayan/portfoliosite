@@ -12,7 +12,6 @@ export function el(tag, props = {}, ...children) {
     if (value == null || value === false) continue;
     if (key === 'class') node.className = value;
     else if (key === 'text') node.textContent = value;
-    else if (key === 'html') node.innerHTML = value;
     else if (key.startsWith('on')) node.addEventListener(key.slice(2).toLowerCase(), value);
     else if (key === 'dataset') Object.assign(node.dataset, value);
     else node.setAttribute(key, value === true ? '' : value);
@@ -36,49 +35,14 @@ export function hexToRgb(hex) {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
-// Calls fn whenever the light/dark theme changes
+// Calls fn whenever the colors change: the toggle sets data-theme, the OS
+// setting applies when no choice has been saved
 export function onThemeChange(fn) {
   new MutationObserver(fn).observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['data-theme'],
   });
-}
-
-let toastTimer;
-export function toast(message) {
-  const node = document.getElementById('toast');
-  if (!node) return;
-  node.textContent = message;
-  node.classList.add('is-shown');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => node.classList.remove('is-shown'), 2200);
-}
-
-// Opens a <dialog> and animates it in; closeDialog animates it out first.
-export function openDialog(dialog) {
-  if (dialog.open) return;
-  dialog.showModal();
-  requestAnimationFrame(() => dialog.classList.add('is-open'));
-}
-
-export function closeDialog(dialog) {
-  if (!dialog.open || !dialog.classList.contains('is-open')) return;
-  dialog.classList.remove('is-open');
-  const done = () => dialog.open && dialog.close();
-  if (reducedMotion.matches) return done();
-  dialog.addEventListener('transitionend', done, { once: true });
-  setTimeout(done, 500);
-}
-
-// Wire the usual dialog dismissals: backdrop click and Escape both animate out.
-export function wireDialog(dialog) {
-  dialog.addEventListener('cancel', (e) => {
-    e.preventDefault();
-    closeDialog(dialog);
-  });
-  dialog.addEventListener('click', (e) => {
-    if (e.target === dialog) closeDialog(dialog);
-  });
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', fn);
 }
 
 // Runs fn once, the first time `target` scrolls near the viewport
@@ -91,19 +55,4 @@ export function whenNear(target, fn, rootMargin = '200px') {
     }
   }, { rootMargin });
   io.observe(target);
-}
-
-// Deterministic PRNG so generated art looks the same on every visit
-export function seeded(seedString) {
-  let h = 1779033703 ^ seedString.length;
-  for (let i = 0; i < seedString.length; i++) {
-    h = Math.imul(h ^ seedString.charCodeAt(i), 3432918353);
-    h = (h << 13) | (h >>> 19);
-  }
-  return () => {
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    h ^= h >>> 16;
-    return (h >>> 0) / 4294967296;
-  };
 }
