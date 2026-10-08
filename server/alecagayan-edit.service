@@ -1,0 +1,21 @@
+[Unit]
+Description=alecagayan.com edit-mode API
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+EnvironmentFile=/etc/alecagayan-edit.env
+Environment=SITE_ROOT=/var/www/alecagayan.com
+ExecStart=/usr/bin/python3 /var/www/alecagayan.com/server/server.py
+Restart=on-failure
+
+# It only ever needs to write to uploads/
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/www/alecagayan.com/uploads
+
+[Install]
+WantedBy=multi-user.target

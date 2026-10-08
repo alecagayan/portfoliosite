@@ -1,4 +1,5 @@
 import { $, el, whenNear } from './util.js';
+import { state as gallery, loadShots, renderAllGalleries } from './gallery.js';
 
 /* Theme toggle. With no saved choice the page follows the OS setting. */
 const root = document.documentElement;
@@ -29,6 +30,7 @@ function renderProjects(projects) {
         el('div', { class: 'project-head' }, el('h3', { text: p.title }), el('span', { class: 'meta', text: p.year })),
         el('p', { class: 'project-desc', text: p.description }),
         tagList(p.tags),
+        el('div', { class: 'shots-slot', dataset: { project: p.id } }),
         el(
           'div',
           { class: 'project-links' },
@@ -82,12 +84,20 @@ const getJSON = (path) =>
     return res.json();
   });
 
-Promise.all(['projects', 'experience', 'certifications', 'skills'].map((name) => getJSON(`data/${name}.json`)))
+Promise.all([...['projects', 'experience', 'certifications', 'skills'].map((name) => getJSON(`data/${name}.json`)), loadShots()])
   .then(([projects, jobs, certs, skills]) => {
+    gallery.projects = projects;
     renderProjects(projects);
+    renderAllGalleries();
     renderExperience(jobs);
     renderCerts(certs);
     renderSkills(skills);
+    // alecagayan.com/?edit turns on edit mode (password required)
+    if (new URLSearchParams(location.search).has('edit')) {
+      import('./editor.js')
+        .then((mod) => mod.start())
+        .catch((err) => console.error('Could not start edit mode', err));
+    }
   })
   .catch((err) => {
     console.error('Could not load site content', err);
